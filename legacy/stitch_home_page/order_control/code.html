@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TCG Trading - Order Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00529B",
+                        "background-light": "#F5F7FA",
+                        "background-dark": "#111418",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex h-screen">
+<!-- Side Navigation Bar -->
+<div class="w-64 bg-background-light dark:bg-[#1c2127] flex flex-col p-4 border-r border-gray-200 dark:border-gray-700">
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="TCG Trading Logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxRWOPHSgEcrikTvrTGTujm_VdWNZWBlQn2GAPTw7lfyOpDj8NY0TGVpkUP1bx6VUoG_CC5Pd5fUmhz3ybHM49V17D28KCJ_ujWpA_6al-dqg5mDFuhTRbq929lIyxl4eCzXGS-z6xcAtRydP47BKgw5WRef5Rbtskxi9C1S4UZIktqtMDuXOHt9LlBDff8F2yYwkmtvsdJwSrrylHdAlWVMl5d2ZLHyBV5v0OGGV52MVzrF_cBVwrp1Wgv313jgw_XZ_1wolWxGsB");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">TCG Trading</h1>
+<p class="text-gray-500 dark:text-[#9dabb9] text-sm font-normal leading-normal">CRM Center</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#283039]" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 dark:bg-[#283039] text-primary dark:text-white" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<p class="text-sm font-medium leading-normal">Orders</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#283039]" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<p class="text-sm font-medium leading-normal">Products</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#283039]" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium leading-normal">Customers</p>
+</a>
+</div>
+<div class="flex flex-col gap-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">New Order</span>
+</button>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#283039]" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#283039]" href="#">
+<span class="material-symbols-outlined">help</span>
+<p class="text-sm font-medium leading-normal">Help</p>
+</a>
+</div>
+</div>
+</div>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="p-4 border-b border-gray-200 dark:border-gray-700">
+<h1 class="text-gray-900 dark:text-white text-2xl font-bold leading-tight tracking-tight">Order Control</h1>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Pane: Order List -->
+<div class="w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+<div class="p-4 border-b border-gray-200 dark:border-gray-700">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+<input class="form-input w-full pl-10 pr-4 py-2 rounded-lg text-gray-900 dark:text-white bg-gray-100 dark:bg-[#283039] border-gray-200 dark:border-gray-600 focus:ring-primary focus:border-primary" placeholder="Search by Order ID, Customer..."/>
+</div>
+<div class="flex gap-2 mt-3 overflow-x-auto">
+<button class="flex-shrink-0 flex h-8 items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#283039] px-3 text-sm font-medium text-gray-800 dark:text-white">
+<span>Status: All</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<button class="flex-shrink-0 flex h-8 items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#283039] px-3 text-sm font-medium text-gray-800 dark:text-white">
+<span>Date Range</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+<button class="flex-shrink-0 flex h-8 items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#283039] px-3 text-sm font-medium text-gray-800 dark:text-white">
+<span>Payment</span>
+<span class="material-symbols-outlined text-base">expand_more</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-[#1c2127] dark:text-gray-400 sticky top-0">
+<tr>
+<th class="px-4 py-3" scope="col">Order ID</th>
+<th class="px-4 py-3" scope="col">Customer</th>
+<th class="px-4 py-3" scope="col">Date</th>
+<th class="px-4 py-3" scope="col">Status</th>
+<th class="px-4 py-3 text-right" scope="col">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-primary/20 dark:bg-primary/30 border-b dark:border-gray-700 cursor-pointer">
+<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">#12345</td>
+<td class="px-4 py-3">John Doe</td>
+<td class="px-4 py-3">Oct 27, 2023</td>
+<td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Processing</span></td>
+<td class="px-4 py-3 text-right">$150.00</td>
+</tr>
+<tr class="bg-white dark:bg-background-dark border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#1c2127] cursor-pointer">
+<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">#12346</td>
+<td class="px-4 py-3">Jane Smith</td>
+<td class="px-4 py-3">Oct 27, 2023</td>
+<td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Shipped</span></td>
+<td class="px-4 py-3 text-right">$25.50</td>
+</tr>
+<tr class="bg-white dark:bg-background-dark border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#1c2127] cursor-pointer">
+<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">#12347</td>
+<td class="px-4 py-3">Peter Jones</td>
+<td class="px-4 py-3">Oct 26, 2023</td>
+<td class="px-4 py-3"><span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">Pending</span></td>
+<td class="px-4 py-3 text-right">$300.10</td>
+</tr>
+<tr class="bg-white dark:bg-background-dark border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#1c2127] cursor-pointer">
+<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">#12348</td>
+<td class="px-4 py-3">Mary Johnson</td>
+<td class="px-4 py-3">Oct 25, 2023</td>
+<td class="px-4 py-3"><span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Completed</span></td>
+<td class="px-4 py-3 text-right">$75.00</td>
+</tr>
+<tr class="bg-white dark:bg-background-dark border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#1c2127] cursor-pointer">
+<td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">#12349</td>
+<td class="px-4 py-3">David Williams</td>
+<td class="px-4 py-3">Oct 24, 2023</td>
+<td class="px-4 py-3"><span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Cancelled</span></td>
+<td class="px-4 py-3 text-right">$120.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Pane: Order Details -->
+<div class="w-2/3 flex flex-col bg-white dark:bg-[#1c2127] overflow-y-auto">
+<div class="p-6 border-b border-gray-200 dark:border-gray-700">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Order #12345</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">October 27, 2023</p>
+</div>
+<span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-4 py-1 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Processing</span>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="flex items-center justify-center gap-2 h-9 px-4 rounded-lg bg-green-600 text-white text-sm font-medium">
+<span class="material-symbols-outlined text-base">local_shipping</span>
+                                Mark as Shipped
+                            </button>
+<button class="flex items-center justify-center gap-2 h-9 px-4 rounded-lg bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white text-sm font-medium">
+<span class="material-symbols-outlined text-base">print</span>
+                                Print Invoice
+                            </button>
+<button class="flex items-center justify-center gap-2 h-9 px-4 rounded-lg bg-red-600 text-white text-sm font-medium">
+<span class="material-symbols-outlined text-base">cancel</span>
+                                Cancel Order
+                            </button>
+</div>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Customer Information -->
+<div class="bg-gray-50 dark:bg-[#283039] p-4 rounded-lg">
+<h3 class="font-semibold text-gray-900 dark:text-white mb-2">Customer Information</h3>
+<p class="text-sm text-gray-600 dark:text-gray-300">John Doe</p>
+<p class="text-sm text-gray-600 dark:text-gray-300">john.doe@example.com</p>
+<p class="text-sm text-gray-600 dark:text-gray-300">(123) 456-7890</p>
+</div>
+<!-- Shipping Address -->
+<div class="bg-gray-50 dark:bg-[#283039] p-4 rounded-lg">
+<h3 class="font-semibold text-gray-900 dark:text-white mb-2">Shipping Address</h3>
+<p class="text-sm text-gray-600 dark:text-gray-300">123 Maple Street</p>
+<p class="text-sm text-gray-600 dark:text-gray-300">Anytown, USA 12345</p>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ordered Cards</h3>
+<div class="flow-root">
+<ul class="-my-4 divide-y divide-gray-200 dark:divide-gray-700" role="list">
+<li class="flex items-center py-4">
+<div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-600">
+<img class="h-full w-full object-cover object-center" data-alt="Pokemon Card Thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALdmc1HwKz80-Xz5KSrLGuas2T8VrJfImlTVTsrcndEJrMOfw_U2Xowv_2Q8JJDvubw9Qc9mL7mDndX34tcWU-76o9UR9PuFcx_psINyYEWi4sAnCelIAccpjxX0oxm65umQjcpbLkuOPfl3VEmnSXWhIz6wmtXCyDuuZvoV5boOl3f67-jwRV7ToMBqEhygfDGDRgy-5co7MXWw1LlHgYwz1V7FtI_ZORNDDf-APZkiLHGoHJzlG96CzyofP6VuWSPUBl4xrhvgfC"/>
+</div>
+<div class="ml-4 flex flex-1 flex-col">
+<div>
+<div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+<h3>Pikachu VMAX</h3>
+<p class="ml-4">$50.00</p>
+</div>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Vivid Voltage</p>
+</div>
+<div class="flex flex-1 items-end justify-between text-sm">
+<p class="text-gray-500 dark:text-gray-400">Qty 2</p>
+<p class="font-medium text-gray-900 dark:text-white">Subtotal: $100.00</p>
+</div>
+</div>
+</li>
+<li class="flex items-center py-4">
+<div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-600">
+<img class="h-full w-full object-cover object-center" data-alt="Yugioh Card Thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQusray10kfW_icPjLp4OZDfYdXJD4Ir6Tfd_Lhtr8hxB_p6XdNC_2KkDROb8HTJi_ybilACIKuTe51A4QIGac761yCkjNWrTPcNQlTEEvwrNCvgZ7usHtR28_3HXk1ohZOUTvLW98Va8tfwdCD-EFBFh3qulRqPyBRT81Bhfw0ZwifnLl3oTetadNhipN8D2wVwW9chexGmzqCB-9HKJbAUUD_Z5TkhVVkBvYPmLZ6x8rPCXOEbUb0UxotWoP3633kROUjKoOuZw6"/>
+</div>
+<div class="ml-4 flex flex-1 flex-col">
+<div>
+<div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+<h3>Blue-Eyes White Dragon</h3>
+<p class="ml-4">$25.00</p>
+</div>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Legend of Blue Eyes White Dragon</p>
+</div>
+<div class="flex flex-1 items-end justify-between text-sm">
+<p class="text-gray-500 dark:text-gray-400">Qty 1</p>
+<p class="font-medium text-gray-900 dark:text-white">Subtotal: $25.00</p>
+</div>
+</div>
+</li>
+<!-- More items... -->
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 mt-auto bg-gray-50 dark:bg-[#283039]">
+<div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+<p>Subtotal</p>
+<p>$125.00</p>
+</div>
+<div class="flex justify-between text-sm text-gray-600 dark:text-gray-300 mt-1">
+<p>Shipping</p>
+<p>$15.00</p>
+</div>
+<div class="flex justify-between text-sm text-gray-600 dark:text-gray-300 mt-1">
+<p>Tax</p>
+<p>$10.00</p>
+</div>
+<div class="flex justify-between text-lg font-bold text-gray-900 dark:text-white mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+<p>Total</p>
+<p>$150.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

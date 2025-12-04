@@ -1,0 +1,43 @@
+
+                card_frame = ctk.CTkFrame(items_frame, fg_color=BG_COLOR, corner_radius=8)
+
+                thumb_label = ctk.CTkLabel(card_frame, text="?", width=120, height=168, fg_color=FIELD_BG_COLOR, corner_radius=6)
+                thumb_label.pack(padx=10, pady=(10, 5))
+                if image_path:
+                    try:
+                        img = _get_thumbnail(image_path, (120, 168))
+                        if img:
+                            photo = _create_image(img)
+                            thumb_label.configure(image=photo, text="")
+                            thumb_label.image = photo
+                    except Exception as e:
+                        logger.warning(f"Błąd ładowania miniaturki dla {shoper_code}: {e}")
+
+                ctk.CTkLabel(card_frame, text=name, wraplength=120, font=ctk.CTkFont(size=12)).pack(padx=10, pady=(0, 5))
+
+                var = tk.BooleanVar(value=True)
+                chk = ctk.CTkCheckBox(card_frame, text=f"x{quantity}", variable=var, font=ctk.CTkFont(size=14, weight="bold"))
+                chk.pack(pady=(0, 10))
+
+                selection_data = {"var": var, "quantity": quantity, "lookup_keys": product_codes}
+                if clean_shoper_code:
+                    selection_vars[clean_shoper_code] = selection_data
+                elif product_codes:
+                    selection_vars[product_codes[0]] = selection_data
+
+                row, col = divmod(i, 4)
+                card_frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
+                items_frame.grid_columnconfigure(col, weight=1)
+
+        # ... (reszta kodu - przyciski - bez zmian) ...
+        buttons = ctk.CTkFrame(top, fg_color="transparent")
+        buttons.pack(fill="x", padx=20, pady=(10, 20))
+        buttons.grid_columnconfigure((0, 1, 2), weight=1)
+
+        def _mark_selected():
+            products_to_sell = {
+                code: data["quantity"]
+                for code, data in selection_vars.items()
+                if data["var"].get()
+            }
+            if not products_to_sell:

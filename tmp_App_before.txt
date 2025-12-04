@@ -1,0 +1,255 @@
+
+import { useMemo, useState, useEffect } from 'react'
+import Button from './components/Button'
+import Card from './components/Card'
+import TabBar from './components/TabBar'
+import Sidebar from './components/Sidebar'
+import Home from './views/Home'
+import ReportsView from './views/Reports'
+import ScanView from './views/Scan'
+import AttributeForm from './components/AttributeForm'
+import InventoryView from './views/Inventory'
+import OrdersView from './views/Orders'
+import PricingView from './views/Pricing'
+import BiddingView from './views/Bidding'
+type Candidate = { id: string; name: string; score: number }
+export default function App() {
+
+  const [image, setImage] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [batchFiles, setBatchFiles] = useState<File[] | null>(null)
+  const [batchIndex, setBatchIndex] = useState<number>(0)
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<{
+    detected: { name: string | null; set: string | null; number: string | null };
+    candidates: Candidate[];
+    message: string;
+  } | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [scanId, setScanId] = useState<number | null>(null)
+  const [history, setHistory] = useState<any[] | null>(null)
+  const [detail, setDetail] = useState<any | null>(null)
+  const [sessionId, setSessionId] = useState<number | null>(null)
+  const [tab, setTab] = useState<'dashboard'|'reports'|'scan'|'inventory'|'orders'|'pricing'|'detail'>(/Android/i.test(navigator.userAgent||'') ? 'scan' : 'dashboard')
+  const [toast, setToast] = useState<string | null>(null)
+  const [mobileSessions, setMobileSessions] = useState<any[] | null>(null)
+  const [selectedSession, setSelectedSession] = useState<number | null>(null)
+  const [sessionScans, setSessionScans] = useState<any[] | null>(null)
+  const [previewPayloads, setPreviewPayloads] = useState<any[] | null>(null)
+  const [stats, setStats] = useState<any | null>(null)
+  const [products, setProducts] = useState<any[] | null>(null)
+  const [invTotal, setInvTotal] = useState<number>(0)
+  const [invPage, setInvPage] = useState<number>(1)
+  const [invLimit, setInvLimit] = useState<number>(100)
+  const [invSort, setInvSort] = useState<string>('updated_at')
+  const [invOrder, setInvOrder] = useState<string>('asc')
+  const [search, setSearch] = useState<string>("")
+  const [pricingItems, setPricingItems] = useState<any[] | null>(null)
+  const [dups, setDups] = useState<any[] | null>(null)
+  const [orders, setOrders] = useState<any[] | null>(null)
+  const [prefetchMap, setPrefetchMap] = useState<Record<number, { thumb?: string; price?: number }>>({})
+  const [showAttr, setShowAttr] = useState<boolean>(false)
+  const [categories, setCategories] = useState<any[] | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null)
+  const [pricePln, setPricePln] = useState<string>("")
+  const [nameOverride, setNameOverride] = useState<string>("")
+  const [numberInput, setNumberInput] = useState<string>("")
+  const [numberOverride, setNumberOverride] = useState<string>("")
+  const [totalOverride, setTotalOverride] = useState<string>("")
+  const [finishLabel, setFinishLabel] = useState<string | undefined>(undefined)
+  const [variantChoices, setVariantChoices] = useState<any[] | null>(null)
+  const [variantCands, setVariantCands] = useState<any[] | null>(null)
+  const [forceFinishLabel, setForceFinishLabel] = useState<string | null>(null)
+  const [variantSelect, setVariantSelect] = useState<string>("")
+  const [hoverVariantImg, setHoverVariantImg] = useState<string | null>(null)
+  const [selectedVariantCandId, setSelectedVariantCandId] = useState<string | null>(null)
+  const [selectedVariantLabel, setSelectedVariantLabel] = useState<string | null>(null)
+  const [live, setLive] = useState<boolean>(false)
+  const liveRef = useMemo(()=>({ stream: null as MediaStream | null, timer: 0 as any, video: null as HTMLVideoElement | null, canvas: null as HTMLCanvasElement | null }),[])
+  const isAndroid = useMemo(()=>/Android/i.test(navigator.userAgent||''), [])
+  const [liveAnalyzing, setLiveAnalyzing] = useState<boolean>(false)
+  const [liveStatus, setLiveStatus] = useState<string>("")
+  const [liveRipple, setLiveRipple] = useState<boolean>(false)
+  const lastCntRef = useMemo(()=>({ cnt: 0 }), [])  // Resolve backend API base URL early (used by effects below)
+  const apiBase = useMemo(() => {
+    const env = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
+    if (env) return env;
+    try {
+      const url = new URL(window.location.href)
+      const port = url.port === "5173" ? "8000" : url.port
+      url.port = port || "8000"
+      url.pathname = ""
+      return `${url.origin.replace(/:\\d+$/, ":" + (port || "8000"))}`
+    } catch {
+      return "http://localhost:8000"
+    }
+  }, [])
+  const todo = sessionScans.slice(0, limit).filter((x:any)=> prefetchMap[x.id] == null)      if (todo.length===0) return    
+  const updates: Record<number, { thumb?: string; price?: number }> = {}      for (const x of todo){        try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }         
+  const cand = Array.isArray(d?.candidates) && d.candidates.length>0 ? d.candidates[0] : null        
+  const thumb = (cand?.image && String(cand.image)) || (d?.image_url && (d.image_url.startsWith('http')? d.image_url : `${apiBase}${d.image_url}`)) || undefined          updates[x.id] = { ...(updates[x.id]||{}), thumb }          // Estimate price (lightweight) without confirming selection        
+  const body:any = { name: d?.detected?.name, number: d?.detected?.number, set: d?.detected?.set }          try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }           
+  const rp = await fetch(`${apiBase}/pricing/estimate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })          
+  const pd = await rp.json()          
+  const price = pd?.pricing?.price_pln_final ?? pd?.pricing?.price_pln      }      if (Object.keys(updates).length>0){ setPrefetchMap(prev=> ({ ...prev, ...updates })) }    })()  }, [sessionScans, isAndroid, apiBase])  // Open a specific scan from the desktop list (loads details to the editor panel)
+  const openScanFromList = async (id: number) => {    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }     
+  const r = await fetch(`${apiBase}/scans/${id}`)      if (!r.ok) return    
+  const d = await r.json()      setResult(d)      setScanId(d?.id ?? null)      // Preselect candidate: prefer selected, else top-1    
+  const detName = (d?.detected?.name || '').trim()    
+  const detNum = (d?.detected?.number || '').trim()      setNameOverride(detName)      setNumberInput(detNum)      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const m = detNum.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if (m){ setNumberOverride(m[1]||''); if(m[2]) setTotalOverride(m[2]) } else { setNumberOverride(detNum) } } catch { setNumberOverride(detNum) }      // Preselect category by detected set name      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }       
+  const setName = d?.detected?.set        if (setName && Array.isArray(categories)){
+
+  const found = categories.find((c:any)=> (c.name||'').toLowerCase() === String(setName).toLowerCase())          if (found && (found.category_id||found.id)) setSelectedCategoryId(Number(found.category_id||found.id))      if (d?.image_url) setPreview(d.image_url.startsWith('http')? d.image_url : `${apiBase}${d.image_url}`)    } catch {}  }    // Load categories once (fallback to ids_dump when empty or 4xx)  useEffect(()=>{    (async()=>{       try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }        
+  const r = await fetch(`${apiBase}/shoper/categories`);         let items:any[] = []        if (r.ok) {
+
+  const d = await r.json(); items = Array.isArray(d?.items)? d.items : [] }        if (!items || items.length===0){          try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const r2 = await fetch(`${apiBase}/ids_dump`); if (r2.ok){
+
+  const d2 = await r2.json(); const cats = Array.isArray(d2?.categories)? d2.categories : []; items = cats.map((c:any)=>({ category_id: c.category_id||c.id, name: c.name||c.category })) } } catch {}        }        // sort: existing first, then virtual (nowa), then by name      
+  const sorted = (items||[]).slice().sort((a:any,b:any)=>{
+
+  const aExist = (a.category_id!=null || a.id!=null) ? 0 : 1        
+  const bExist = (b.category_id!=null || b.id!=null) ? 0 : 1          if (aExist !== bExist) return aExist - bExist        
+  const an = (a.name||a.category||'').toLowerCase(); const bn=(b.name||b.category||'').toLowerCase()      } catch { setCategories([]) }     })()  }, [])  // Auto-preselect category by set once categories and result are ready  useEffect(()=>{    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!result) return    
+  const setName = (result?.detected?.set || '').toString()      if (!setName) return    
+  const found = categories.find((c:any)=> ((c.name||'').toLowerCase() === setName.toLowerCase()))      if (found) setSelectedCategoryId(Number(found.category_id||found.id))    } catch {}  }, [categories, result])  // Expose detail setter for quick navigation from dynamic handlers  useEffect(()=>{    (window as any).setDetail = (data: any) => { setDetail(data); setTab('detail') }    return () => { try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }  delete (window as any).setDetail } catch { /* noop */ } }  }, [])
+  const onFile = (f: File | null) => {    setResult(null)    setSelected(null)    
+  const url = URL.createObjectURL(f)      setPreview(url)    } else {      setPreview(null)    }  }
+  const onFolder = (files: FileList | null) => {    if (!files || files.length===0) { setBatchFiles(null); setBatchIndex(0); return }  
+  const arr = Array.from(files).filter(f=>/\.(jpe?g|png|webp)$/i.test(f.name))    setBatchFiles(arr)    setBatchIndex(0)    if (arr.length>0){ onFile(arr[0]) }    // Auto start session if not present    if (!sessionId) {      fetch(`${apiBase}/sessions/start`, { method: 'POST' }).then(r=>r.json()).then(d=>{ if (d?.session_id) setSessionId(d.session_id) }).catch(()=>{})    }  
+  const f = e.target.files?.[0] || null    onFile(f)  }
+  const submit = async () => {    if (!image) return    setLoading(true)    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }     
+  const form = new FormData()      form.append('file', image)    
+  const url = sessionId ? `${apiBase}/scan?session_id=${sessionId}` : `${apiBase}/scan`    
+  const res = await fetch(url, { method: 'POST', body: form })    
+  const data = await res.json()      setResult(data)      setScanId(data.scan_id ?? null)      setSelected(data.candidates?.[0]?.id ?? null)    
+  const detName = (data?.detected?.name || '').trim()    
+  const detNum = (data?.detected?.number || '').trim()      setNameOverride(detName)      setNumberInput(detNum)      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const m = detNum.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if (m){ setNumberOverride(m[1]||''); if(m[2]) setTotalOverride(m[2]) } else { setNumberOverride(detNum) } } catch { setNumberOverride(detNum) }      // preselect category by detected set name if possible      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }       
+  const setName = data?.detected?.set        if (setName && Array.isArray(categories)){
+
+  const found = categories.find((c:any)=> (c.name||'').toLowerCase() === String(setName).toLowerCase())          if (found && (found.category_id||found.id)) setSelectedCategoryId(Number(found.category_id||found.id))        }      } catch {}      // no bottom attribute panel    } catch (e) {      console.error(e)      alert('Błąd podczas skanowania')    } finally {      setLoading(false)    }  }
+  const startLive = async () => {    if (live) return    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }     
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } as any } as any, audio: false })      video.srcObject = stream      await video.play()      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      canvas.width = w; canvas.height = h      liveRef.stream = stream; liveRef.video = video; liveRef.canvas = canvas      setLive(true)      if (!sessionId) {        try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const r = await fetch(`${apiBase}/sessions/start`, { method: 'POST' }); const d = await r.json(); if (d?.session_id) setSessionId(d.session_id) } catch {}      }    
+  const loop = async () => {        try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }           setLiveAnalyzing(true)          setLiveStatus('Analizuję klatkę…')        
+  const ctx = canvas.getContext('2d')!          ctx.drawImage(video, 0, 0, w, h)        
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8)        
+  const r = await fetch(`${apiBase}/scan/frame`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataUrl, session_id: sessionId }) })          if (r.ok){            setSelected(data.candidates?.[0]?.id ?? null)          
+  const detName = (data?.detected?.name || '').trim()          
+  const detNum = (data?.detected?.number || '').trim()            setNameOverride(detName)            setNumberInput(detNum)            try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const m = detNum.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if (m){ setNumberOverride(m[1]||''); if(m[2]) setTotalOverride(m[2]) } else { setNumberOverride(detNum) } } catch { setNumberOverride(detNum) }            // Update preview from frame (fast)            if (cnt>0 && lastCntRef.cnt===0){              setLiveRipple(true)              setTimeout(()=>setLiveRipple(false), 500)            }            lastCntRef.cnt = cnt            setLiveStatus(cnt>0 ? `Znaleziono ${cnt} dopas.` : 'Brak dopasowania')          }        } catch {}        finally {          setLiveAnalyzing(false)    } catch (e) {      setToast('Brak dostępu do kamery')    }  }
+  const stopLive = () => {      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }  if (liveRef.timer) { clearInterval(liveRef.timer); liveRef.timer = 0 } } catch {}    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }  liveRef.stream?.getTracks().forEach(t=>t.stop()) } catch {}    liveRef.stream = null; liveRef.video = null; liveRef.canvas = null    setLive(false)    setLiveAnalyzing(false)    setLiveStatus("")    lastCntRef.cnt = 0    setLiveRipple(false)  }  useEffect(()=>{    if (tab==='scan' && isAndroid && !live) {      startLive().catch(()=>{})    }  }, [tab, isAndroid])      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const r = await fetch(`${apiBase}/stats`); const d = await r.json(); setStats(d) } catch {}  }
+  const loadProducts = async (query?: string, page?: number, sort?: string, order?: string, limit?: number, categoryId?: number) => {    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }     
+  const url = new URL(`${apiBase}/products`)      url.searchParams.set('limit', String(limit ?? invLimit))      url.searchParams.set('page', String(page ?? invPage))      if (query) url.searchParams.set('q', query)      if (sort) url.searchParams.set('sort', sort)      if (order) url.searchParams.set('order', order)      if (categoryId) url.searchParams.set('category_id', String(categoryId))    
+  const r = await fetch(url.toString()); const d = await r.json();      if (Array.isArray(d)) { setProducts(d); setInvTotal(d.length) } else { setProducts(d.items || []); setInvTotal(Number(d.total_count||0)) }    } catch {}  }
+  const loadPricing = async () => {    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }     
+  const r = await fetch(`${apiBase}/scans?limit=50`); const items = await r.json();    
+  const selected = items.filter((x: any) => x.selected)    
+  const subset = selected.slice(0, 15)  }
+  const loadOrders = async () => {    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)  return (    <div className="font-display">      <div className="flex">        <Sidebar active={tab} onChange={(k)=>{ setTab(k as any); if(k==='dashboard') loadStats(); if(k==='inventory' && !products) loadProducts(); if(k==='pricing') loadPricing(); if(k==='orders') loadOrders(); }} />        <main className="relative flex-1 p-4 md:p-8">      {tab==='dashboard' && (<Home stats={stats} onNav={(k)=>{        setTab(k as any); if(k==='inventory' && !products) loadProducts(); if(k==='pricing') loadPricing(); if(k==='orders') loadOrders();      }} onRefresh={loadStats} />)}      {tab==='reports' && (<ReportsView />)}      {tab==='scan' && (        <ScanView          preview={preview}          loading={loading}          analyzing={liveAnalyzing}          status={liveStatus}          onPick={(id)=>setSelected(id)}          onFile={onCaptureChange}          onFolder={(e:any)=>{
+
+  const fl = e.target?.files || null; onFolder(fl) }}          onSubmit={submit}          onConfirm={async ()=>{            if (!selected || !result) return      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }             
+  const res = await fetch(`${apiBase}/confirm`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scan_id: scanId, candidate_id: selected, detected: result.detected }) })            
+  const data = await res.json(); const p = data.pricing; if (p && p.price_pln_final!=null) setPricePln(String(p.price_pln_final)); setToast(p ? `Cena: ${p.price_pln_final ?? '—'} PLN` : `Zapisano wybór #${data.scan_id}`)            } catch { setToast('Nie udało się zapisać wyboru') }          }}          rightExtras={ (result && scanId) ? (            <div className="grid gap-3">              {/* Desktop helper: live scans from phone */}              {!isAndroid && (                <div className="p-3 rounded-lg border border-white/10 bg-[#0b1324]">                  <div className="flex items-center justify-between mb-2">                    <div className="text-white font-semibold">Live z telefonu</div>                    <div className="text-xs text-gray-400">ostatnie sesje</div>                  </div>                  <div className="flex items-center gap-2 mb-2">                    <select className="bg-[#101922] border border-gray-700 text-white text-sm rounded-md px-2 py-1" value={selectedSession??''} onChange={(e)=> setSelectedSession(e.target.value? Number(e.target.value): null)}>                      ))}                    </select>                    <button className="btn" onClick={()=>{ setSelectedSession(null); setSessionScans(null) }}>Wyczyść</button>                  </div>                  {Array.isArray(sessionScans) && sessionScans.length>0 ? (                    <div className="grid gap-1" style={{ maxHeight: 220, overflowY:'auto' }}>                      {sessionScans.map((x:any)=> (                        <div key={x.id} className="flex items-center justify-between text-sm text-gray-300 border border-white/10 rounded-md px-2 py-1 cursor-pointer hover:bg-[#0f1a2a]" onClick={()=>openScanFromList(x.id)}>                          <div className="flex items-center gap-2 min-w-0">                            {prefetchMap[x.id]?.thumb && (<img src={prefetchMap[x.id]?.thumb} alt="miniatura" className="w-8 h-12 object-cover rounded" />)}                            <div className="truncate"><span className="text-white">{x.detected_name||"-"}</span> <span className="text-gray-500">{x.detected_set||""} {x.detected_number?`#${x.detected_number}`:""}</span></div>                          </div>                      ))}                    </div>                  ) : (                    <div className="text-xs text-gray-500">Brak wybranej sesji lub brak skanów.</div>                  )}                </div>              )}              {!isAndroid && (                <div className="flex gap-2 items-center">                  <button className="px-3 py-2 rounded-md text-sm bg-[#283039] text-white border border-white/10" onClick={startLive} disabled={live}>Start kamera</button>                  <button className="px-3 py-2 rounded-md text-sm bg-[#3a1f1f] text-white border border-white/10" onClick={stopLive} disabled={!live}>Stop</button>                  {live && <span className="spinner" />}                </div>              )}              <div>                <label className="block text-sm font-medium text-gray-300">Nazwa produktu</label>                <input value={nameOverride} onChange={(e)=>setNameOverride(e.target.value)} className="mt-1 block w-full pl-3 pr-3 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="np. Pikachu #25" />              </div>              <div>                <label className="block text-sm font-medium text-gray-300">Numer karty</label>                <input value={numberInput} onChange={(e)=>{
+
+  const val=e.target.value; setNumberInput(val); const m=val.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if(m){ setNumberOverride(m[1]||''); setTotalOverride(m[2]||'') } }} onBlur={()=>{
+
+  const m=numberInput.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if(m){ setNumberInput(m[2]?`${m[1]}/${m[2]}`:m[1]) } }} className="mt-1 block w-full pl-3 pr-3 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="np. 25 lub 25/102" />                {(()=>{
+
+  const m = numberInput.match(/^\s*(\d{1,3})(?:\s*\/\s*(\d{1,3}))?\s*$/); if (m && m[2]) return (<div className="text-xs text-gray-400 mt-1">Total: {m[2]}</div>); if (numberInput && !m) return (<div className="text-xs text-yellow-400 mt-1">Format: NNN lub NNN/NNN</div>); return null })()}              </div>              <div>                <label className="block text-sm font-medium text-gray-300">Zestaw / Kategoria</label>                <select value={(selectedCategoryId!=null)?String(selectedCategoryId):(selectedCategoryName?`v:${selectedCategoryName}`:'')} onChange={(e)=>{
+
+  const val = e.target.value                  if (val.startsWith('v:')){ setSelectedCategoryId(null); setSelectedCategoryName(val.slice(2)) }                  else { setSelectedCategoryId(val?Number(val):null); setSelectedCategoryName(null) }                }} className="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">                  <option value="">— wybierz —</option>                  {(categories||[]).map((c:any)=> {
+
+  const cid = c.category_id||c.id; const nm = c.name||c.category; const val = cid? String(cid) : `v:${nm}`;              </div>              <div>                <label className="block text-sm font-medium text-gray-300">Cena (PLN)</label>                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>                  <input type="number" step="0.01" value={pricePln} onChange={(e)=>setPricePln(e.target.value)} className="mt-1 block w-full pl-3 pr-3 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="np. 19.99" />                  <select value={variantSelect} onChange={(e)=>setVariantSelect(e.target.value)} className="mt-1 block w-44 pl-3 pr-3 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">                    <option value="">Wybierz wariant</option>                    <option value="Normal">Normal</option>                    <option value="Holo">Holo</option>                    <option value="Reverse Holo">Reverse Holo</option>                  </select>                  <button className="btn" onClick={async ()=>{                    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }                      
+  const body:any = { name: nameOverride || result?.detected?.name, number: numberOverride || result?.detected?.number, set: result?.detected?.set }                      if (variantSelect) body.variant = variantSelect; else if (finishLabel) body.variant = finishLabel                    
+  const r = await fetch(`${apiBase}/pricing/estimate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })                    
+  const d = await r.json(); const p = d?.pricing?.price_pln_final; if (p!=null){ setPricePln(String(p)); setToast(`Cena: ${p} PLN`) } else { setToast('Nie znaleziono ceny') }                    } catch { setToast('Błąd pobierania ceny') }                  }}>Pobierz cenę</button>                  <button className="btn" onClick={async ()=>{                    try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }                     
+  const body:any = { name: nameOverride || result?.detected?.name, number: numberOverride || result?.detected?.number, set: result?.detected?.set }                    
+  const r = await fetch(`${apiBase}/pricing/variants`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })                    
+  const d = await r.json(); const arr = Array.isArray(d?.variants)? d.variants : []; setVariantChoices(arr); setVariantCands(Array.isArray(d?.candidates)? d.candidates : [])                      if (!arr.length) setToast('Brak wariantów cen')                    } catch { setToast('Błąd pobierania wariantów') }                  }}>Warianty cen</button>                  <button className="btn" onClick={()=>{
+
+  const n = encodeURIComponent((nameOverride || result?.detected?.name || '').trim())                  
+  const num = encodeURIComponent((numberOverride || result?.detected?.number || '').trim())                  
+  const url = `https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${n}%20${num}`                    window.open(url, '_blank')                  }}>Sprawdź na CM</button>                  <div style={{ display:'flex', gap:6 }}>                    <input type="number" step="0.01" placeholder="EUR" className="mt-1 block w-28 pl-3 pr-3 py-2 text-base bg-[#101922] border border-gray-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" id="eurInput" />                    <button className="btn" onClick={async ()=>{
+
+  const el = document.getElementById('eurInput') as HTMLInputElement|null                      if (!el || !el.value) { setToast('Podaj cenę w EUR'); return }                      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const r = await fetch(`${apiBase}/pricing/convert`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ eur: Number(el.value) }) }); const d = await r.json(); if (d?.price_pln_final!=null){ setPricePln(String(d.price_pln_final)); setToast(`Przeliczono: ${d.price_pln_final} PLN`) } } catch { setToast('Błąd przeliczenia') }                    }}>Przelicz</button>                  </div>                </div>              </div>              <AttributeForm                apiBase={apiBase}                scanId={scanId}                onChangeSelections={(data)=>{ if (data.finishLabel) setFinishLabel(data.finishLabel) }}                forceFinishLabel={forceFinishLabel}                onSubmit={async (attrs)=>{                  if (batchFiles && batchFiles.length>0 && scanId) {                    ;(window as any)._pending = (window as any)._pending || []                    ;(window as any)._pending.push({ scanId, attrs, category_id: selectedCategoryId, price_pln_final: pricePln ? Number(pricePln) : undefined, name_override: nameOverride })                  
+  const next = (batchIndex+1)                    if (next < batchFiles.length) {                      setBatchIndex(next)                      onFile(batchFiles[next])                    } else {                      setToast('Zakończono wczytywanie pakietu. Gotowe do publikacji.')                    }                    return                  }                  try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }                   
+  const body:any = { attributes: attrs }                    if (selectedCategoryId) body.category_id = selectedCategoryId; else if (selectedCategoryName) { body.category_name = selectedCategoryName; body.create_category_if_missing = true }                    if (pricePln) body.price_pln_final = Number(pricePln)                    if (nameOverride) body.name_override = nameOverride                    if (numberOverride) body.number_override = numberOverride                    if (selected) body.candidate_id = selected                  
+  const r = await fetch(`${apiBase}/scans/${scanId}/create_product`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })                  
+  const d = await r.json()                    if ((d && d.ok) || d?.json?.product_id) {
+
+  const up = Array.isArray(d?.uploads) ? d.uploads : []                    
+  const attr = Array.isArray(d?.attributes_applied) ? d.attributes_applied : []                    }                    else if (d && d.error) { setToast(`Błąd tworzenia: ${d.status_code || ''}`) }                    else { setToast('Wysłano żądanie utworzenia produktu') }                  } catch { setToast('Błąd wysyłania produktu') }                }}                onCancel={()=>{ /* inline form: no-op */ }}              />              {Array.isArray(variantChoices) && variantChoices.length>0 && (                <div style={{ position:'fixed', right: 0, top: 0, height:'100%', width: 380, background:'#0b1324', borderLeft:'1px solid #1f2937', padding: 12, overflowY:'auto', zIndex:50 }}>                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>                    <div className="text-white" style={{ fontWeight:600 }}>Warianty cen</div>                  <div className="grid gap-2" style={{ marginBottom: 10 }}>                    {Array.isArray(variantCands) && variantCands.map((c:any, idx:number)=> (                      <div key={idx} className="flex items-center gap-2 bg-[#0f1a2e] rounded-md px-3 py-2" style={{ border: (selectedVariantCandId===c.id?'2px solid #22c55e':'1px solid rgba(255,255,255,0.1)') }} onMouseEnter={()=>{ if(c.image) setHoverVariantImg(c.image) }} onMouseLeave={()=>setHoverVariantImg(null)}>                        {c.image && <img src={c.image} alt={c.name} style={{ width: 36, height: 50, objectFit: 'cover', borderRadius: 4, border: '1px solid #1f2937' }} />}                        <div className="text-sm text-white" style={{ flex:1 }}>                          <div style={{ fontWeight:600 }}>{c.name} {c.number ? `#${c.number}` : ''}</div>                          <div className="text-gray-400">{c.set || '—'}</div>                        </div>                        <button className="btn" onClick={async ()=>{                          try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }                           
+  const body:any = { name: nameOverride || result?.detected?.name, number: numberOverride || result?.detected?.number, set: result?.detected?.set, candidate_id: c.id }                          
+  const r = await fetch(`${apiBase}/pricing/variants`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })                          
+  const d = await r.json(); const arr = Array.isArray(d?.variants)? d.variants : []; setVariantChoices(arr)                            setSelectedVariantCandId(c.id)                          } catch { setToast('Błąd odświeżenia wariantów') }                        }}>Wybierz</button>                      </div>                    ))}                      <img src={hoverVariantImg} alt="preview" style={{ width: 120, height: 168, objectFit:'cover', borderRadius:6 }} />                    </div>                  )}                  {/* Variant prices */}                  <div className="grid gap-2">                    {variantChoices.map((v:any, idx:number)=> (                      <div key={idx} className="flex items-center justify-between bg-[#0f1a2e] rounded-md px-3 py-2" style={{ border: (selectedVariantLabel===v.label?'2px solid #22c55e':'1px solid rgba(255,255,255,0.1)') }}>                        <div className="text-sm text-white">{v.label}</div>                        <div style={{ textAlign:'right' }}>                          <div className="text-sm text-gray-300">{v.price_pln_final ?? '—'} PLN</div>                          {v.source_key && <div className="text-xs text-gray-500">{v.source_key}</div>}                        </div>                        <button className="btn" onClick={()=>{                           if (v.price_pln_final!=null) {                             setPricePln(String(v.price_pln_final));                             // Try to set finish in attribute form based on label                          
+  const base = String(v.label||'').replace(/\s*\(.*\)\s*$/,'').trim() // strip (tcgplayer)                            if (/(reverse)/i.test(base)) setForceFinishLabel('Reverse Holo')                            else if (/(holo|foil)/i.test(base)) setForceFinishLabel('Holo')                            setSelectedVariantLabel(v.label)                            setToast(`Wybrano: ${v.label}`)                            // Zamknij panel i przewiń na górę                            setVariantChoices(null); setVariantCands(null); setHoverVariantImg(null)                            try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }                      </div>                    ))}                  </div>                </div>              )}              {batchFiles && batchFiles.length>0 && (                <div style={{ marginTop: 4, display:'flex', gap: 8 }}>                  <div className="text-sm text-gray-300" style={{ alignSelf:'center' }}>Wsad: {batchIndex+1}/{batchFiles.length}</div>                  <button className="btn" onClick={async ()=>{
+
+  const list = (window as any)._pending || []                    for (const it of list){                      try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }  await fetch(`${apiBase}/scans/${it.scanId}/create_product`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ attributes: it.attrs, category_id: it.category_id, price_pln_final: it.price_pln_final, name_override: it.name_override, number_override: it.number_override, candidate_id: selected }) }) } catch {}                    }                    setToast(`Wysłano ${list.length} produktów do Shopera`)                    ;(window as any)._pending = []                  }}>Publikuj wszystkie</button>                </div>              )}            </div>          ) : null}        />      )}      {/* bottom attribute panel removed */}      {tab==='inventory' && (        <InventoryView          items={(products||[])}          page={invPage}          limit={invLimit}          hasNext={(invPage * invLimit) < invTotal}          sort={invSort}          order={invOrder}          onSearch={(q,sort,order,page,limit,categoryId)=>{ setInvPage(page); setInvLimit(limit); setInvSort(sort); setInvOrder(order); loadProducts(q, page, sort, order, limit, categoryId) }}          onSync={async ()=>{ await fetch(`${apiBase}/sync/shoper`, {method:'POST'}); await loadProducts(undefined, invPage, invSort, invOrder, invLimit) }}        />      )}          <div style={{ fontSize: 18, marginBottom: 8 }}>Szczegóły skanu #{detail.id}</div>          <div style={{ display: 'grid', gap: 12 }}>            <div style={{ display:'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>              {detail.image_url && (                <img src={`${apiBase}${detail.image_url}`} alt="scan-front" style={{ width: '100%', borderRadius: 8 }} />              )}              {detail.back_image_url && (                <img src={`${apiBase}${detail.back_image_url}`} alt="scan-back" style={{ width: '100%', borderRadius: 8 }} />              )}            </div>            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 12 }}>              <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(detail.created_at).toLocaleString()}</div>              <div><strong>Wykryto:</strong> {detail.detected?.name || '—'} {detail.detected?.set ? `(${detail.detected.set})` : ''} {detail.detected?.number ? `#${detail.detected.number}` : ''}</div>              {detail.pricing && (                <div style={{ marginTop: 8 }}>                  <strong>Cena:</strong> {detail.pricing.price_pln_final ?? '—'} PLN                  <div style={{ fontSize: 12, color: '#6b7280' }}>                    bazowa {detail.pricing.cardmarket_7d_average ?? '—'} {detail.pricing.cardmarket_currency || ''} × {detail.pricing.eur_pln_rate} × {detail.pricing.multiplier}                    {detail.pricing.graded_psa10 ? ` | PSA10: ${detail.pricing.graded_psa10} ${detail.pricing.graded_currency || ''}` : ''}                  </div>                </div>              )}            </div>            <div style={{ display:'flex', gap: 12 }}>              {detail.image_url && <a href={`${apiBase}${detail.image_url}`} download target="_blank" rel="noreferrer" style={{ fontSize: 14 }}>Pobierz awers</a>}              {detail.back_image_url && <a href={`${apiBase}${detail.back_image_url}`} download target="_blank" rel="noreferrer" style={{ fontSize: 14 }}>Pobierz rewers</a>}            </div>            <div>              <div style={{ marginBottom: 6 }}><strong>Kandydaci:</strong></div>              <div style={{ display: 'grid', gap: 8 }}>                {detail.candidates?.map((c: any) => (                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 8 }}>                    {c.image && <img src={c.image} alt={c.name} style={{ width: 56, height: 78, objectFit: 'cover', borderRadius: 6, border: '1px solid #e5e7eb' }} />}                    <div style={{ lineHeight: 1.2 }}>                      <div style={{ fontWeight: 600 }}>{c.name}</div>                      <div style={{ fontSize: 12, color: '#6b7280' }}>{c.set || '—'} {c.number ? `#${c.number}` : ''}</div>                      <div style={{ fontSize: 12, color: '#6b7280' }}>Score: {(c.score * 100).toFixed(0)}% {c.chosen ? ' • WYBRANE' : ''}</div>                    </div>            </div>            <div>              <div style={{ marginTop: 12 }}><strong>Duplikaty:</strong></div>              <div className="grid" style={{ marginTop: 8 }}>                <button className="btn" onClick={async ()=>{                  try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const r = await fetch(`${apiBase}/scans/${detail.id}/duplicates`); const out = await r.json(); if (!Array.isArray(out) || !out.length){ setToast('Brak duplikatów'); setDups([]); return } setToast(`Znaleziono ${out.length}`); setDups(out.slice(0,10)) } catch {}                }}>Pobierz duplikaty</button>                <div>                  {Array.isArray(dups) && dups.map((it:any, idx:number)=> (                    <div key={idx} className="radio-row" style={{ cursor:'pointer' }} onClick={async ()=>{ try {
+
+  const isSecure = (window.isSecureContext === true) || ['localhost','127.0.0.1'].includes(location.hostname)      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setLiveStatus('Brak wsparcia kamery w tej przeglądarce'); setToast('Brak wsparcia kamer — użyj Chrome/HTTPS'); return }      if (!isSecure) { setLiveStatus('Kamera wymaga HTTPS lub localhost') }
+  const res = await fetch(`${apiBase}/scans/${it.scan_id}`); const data = await res.json(); setDetail(data); setTab('detail') } catch {} }}>                      scan #{it.scan_id} • dist {it.distance}              </div>            </div>          </div>        </div>      )}      {tab==='orders' && (<OrdersView items={(orders||[])} />)}      {tab==='pricing' && (<PricingView items={(pricingItems||[])} onRefresh={loadPricing} />)}      {tab==='bidding' && (<BiddingView initial={null} queue={[]} />)}      {toast && <div style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: 18, background: '#111', color: '#fff', borderRadius: 10, border: '1px solid #333', padding: '10px 14px' }}>{toast}</div>}        </main>      </div>      {/* Mobile bottom navigation (Android only) */}      <div className="md:hidden" style={{ display: isAndroid ? 'block' : 'none' }}>        <TabBar          tabs={[            { key: 'scan', icon: 'qr_code_scanner' },            { key: 'pricing', icon: 'sell' },            { key: 'inventory', icon: 'visibility' },          ]}          active={tab}          onChange={(k)=>{ setTab(k as any); if(k==='inventory' && !products) loadProducts(); if(k==='pricing') loadPricing(); }}        />      </div>    </div>  )}

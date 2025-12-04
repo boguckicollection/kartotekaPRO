@@ -1,0 +1,44 @@
+
+    payload = {
+        "code": code,
+        "tax_id": str(settings.default_tax_id),
+        "producer_id": str(settings.default_producer_id),
+        "category_id": category_id,
+        "categories": [c for c in [category_id] if c],
+        "type": "0",
+        "translations": {
+            settings.default_language_code: {
+                "name": name,
+                "short_description": short_desc,
+                "active": "1",
+            }
+        },
+        "stock": {
+            "price": f"{price:.2f}",
+            "stock": str(stock_qty),
+            "active": "1",
+            "code": code,
+            "availability_id": str(settings.default_availability_id),
+        },
+    }
+    if image_url:
+        payload["images"] = [{"url": image_url}]
+
+    return payload
+
+
+async def publish_scan_to_shoper(client: ShoperClient, scan: Scan, candidate: ScanCandidate) -> Dict[str, Any]:
+    payload = build_shoper_payload(scan, candidate)
+
+    # Send create product
+    headers = {"Authorization": f"Bearer {client.token}", "Accept": "application/json"}
+    url = f"{client.base_url}{settings.shoper_products_path}"
+    async with httpx.AsyncClient(timeout=30) as http:
+        if settings.publish_dry_run:
+            return {"dry_run": True, "payload": payload}
+        r = await http.post(url, json=payload, headers=headers)
+        try:
+            r.raise_for_status()
+        except Exception:
+            return {"error": True, "status_code": r.status_code, "text": r.text, "payload": payload}
+        return {"ok": True, "json": r.json(), "payload": payload}

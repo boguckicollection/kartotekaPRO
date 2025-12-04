@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TCG Trading Card Store - Statistics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1173d4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-20 xl:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-7xl flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 px-6 py-3">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_330)">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clippath id="clip0_6_330">
+<rect fill="white" height="48" width="48"></rect>
+</clippath>
+</defs>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">TCG Trading Card Store</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-white/70 hover:text-white text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-white/70 hover:text-white text-sm font-medium leading-normal" href="#">Inventory</a>
+<a class="text-white/70 hover:text-white text-sm font-medium leading-normal" href="#">Sales</a>
+<a class="text-white/70 hover:text-white text-sm font-medium leading-normal" href="#">Customers</a>
+<a class="text-white font-bold text-sm leading-normal" href="#">Statistics</a>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Add New Card</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-white/10 text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-white" style="font-size: 20px;">notifications</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-white/10 text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-white" style="font-size: 20px;">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBeA7DbX_yYgySeSIxWeC3Kll3qE4x7qy99FNSphXAsCc5BwlNWGpHjutoGRqXCtdkRzSsFzLPl52zgjCvriuhgqgjTQNcJY2YzBshEpJZAI9OStsHLXViP6Qy4NWfBbpTqjOnv9gZipHsz36Tw6d-ljaz7xQcyVu6cGzdD_fJdZ_xtPcBH4n7Zcy0RpPpbq6ZY76IpDYUqVaVvactpB8XX1kRgV9OcTyekjX8A-xF7fz5AnaioaOa_mNHOaUInIglxur6KBnlWlssD");'></div>
+</div>
+</header>
+<main class="flex flex-col gap-6 p-4 md:p-6">
+<div class="flex flex-wrap justify-between items-center gap-4">
+<div class="flex min-w-72 flex-col gap-2">
+<p class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">Statistics Preview</p>
+<p class="text-white/60 text-base font-normal leading-normal">Daily, weekly, monthly, and yearly insights into your store's performance.</p>
+</div>
+<div class="flex gap-2 p-1 bg-white/5 rounded-lg">
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-md bg-primary/20 text-teal-400 pl-4 pr-4">
+<p class="text-sm font-medium leading-normal">Daily</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-md hover:bg-white/10 pl-4 pr-4">
+<p class="text-white text-sm font-medium leading-normal">Weekly</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-md hover:bg-white/10 pl-4 pr-4">
+<p class="text-white text-sm font-medium leading-normal">Monthly</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-md hover:bg-white/10 pl-4 pr-4">
+<p class="text-white text-sm font-medium leading-normal">Yearly</p>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 border border-white/10">
+<p class="text-white/80 text-base font-medium leading-normal">Total Sales</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">$45,231.89</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+5.4%</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 border border-white/10">
+<p class="text-white/80 text-base font-medium leading-normal">Total Inventory Value</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">$120,450.00</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+2.1%</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 border border-white/10">
+<p class="text-white/80 text-base font-medium leading-normal">Number of Cards Sold</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">1,234</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+8.2%</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 border border-white/10">
+<p class="text-white/80 text-base font-medium leading-normal">Average Sale Price</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">$36.65</p>
+<p class="text-[#E74C3C] text-base font-medium leading-normal">-1.5%</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-6">
+<p class="text-white text-base font-medium leading-normal">Inventory Valuation Trend</p>
+<p class="text-white tracking-light text-[32px] font-bold leading-tight truncate">$120,450.00</p>
+<div class="flex gap-1">
+<p class="text-white/60 text-base font-normal leading-normal">This Month</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+2.1%</p>
+</div>
+<div class="flex min-h-[220px] flex-1 flex-col gap-8 py-4">
+<svg fill="none" height="100%" preserveaspectratio="none" viewbox="-3 0 478 150" width="100%" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z" fill="url(#paint0_linear_1131_5935_2)"></path>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#1ABC9C" stroke-linecap="round" stroke-width="3"></path>
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="paint0_linear_1131_5935_2" x1="236" x2="236" y1="1" y2="149">
+<stop stop-color="#1ABC9C" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="#1ABC9C" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="flex justify-around">
+<p class="text-white/60 text-[13px] font-bold leading-normal tracking-[0.015em]">Week 1</p>
+<p class="text-white/60 text-[13px] font-bold leading-normal tracking-[0.015em]">Week 2</p>
+<p class="text-white/60 text-[13px] font-bold leading-normal tracking-[0.015em]">Week 3</p>
+<p class="text-white/60 text-[13px] font-bold leading-normal tracking-[0.015em]">Week 4</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-6">
+<p class="text-white text-base font-medium leading-normal">Sales by Card Game</p>
+<p class="text-white tracking-light text-[32px] font-bold leading-tight truncate">1,234 Sales</p>
+<div class="flex gap-1">
+<p class="text-white/60 text-base font-normal leading-normal">This Month</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+5.4%</p>
+</div>
+<div class="flex items-center justify-center min-h-[220px] flex-1 py-4">
+<div class="relative w-48 h-48">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="15.91549430918954" stroke="#E74C3C" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="none" r="15.91549430918954" stroke="#3498DB" stroke-dasharray="60, 40" stroke-dashoffset="25" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="none" r="15.91549430918954" stroke="#F1C40F" stroke-dasharray="25, 75" stroke-dashoffset="35" stroke-width="4"></circle>
+</svg>
+</div>
+</div>
+<div class="flex justify-around text-center">
+<div><p class="text-xs text-[#E74C3C] font-bold">Magic</p><p class="text-xs text-white/60">40%</p></div>
+<div><p class="text-xs text-[#3498DB] font-bold">Pokémon</p><p class="text-xs text-white/60">35%</p></div>
+<div><p class="text-xs text-[#F1C40F] font-bold">Yu-Gi-Oh!</p><p class="text-xs text-white/60">25%</p></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-6">
+<p class="text-white text-base font-medium leading-normal">Top 10 Best-Selling Cards</p>
+<p class="text-white tracking-light text-[32px] font-bold leading-tight truncate">Top 10</p>
+<div class="flex gap-1">
+<p class="text-white/60 text-base font-normal leading-normal">This Month</p>
+<p class="text-[#1ABC9C] text-base font-medium leading-normal">+8.2%</p>
+</div>
+<div class="grid gap-x-4 gap-y-3 grid-cols-[auto_1fr] items-center py-3">
+<p class="text-white/60 text-[13px] font-medium leading-normal">Black Lotus</p>
+<div class="h-2 rounded-full bg-white/10"><div class="rounded-full bg-[#E74C3C] h-full" style="width: 95%;"></div></div>
+<p class="text-white/60 text-[13px] font-medium leading-normal">Charizard (1st Ed.)</p>
+<div class="h-2 rounded-full bg-white/10"><div class="rounded-full bg-[#3498DB] h-full" style="width: 88%;"></div></div>
+<p class="text-white/60 text-[13px] font-medium leading-normal">Time Walk</p>
+<div class="h-2 rounded-full bg-white/10"><div class="rounded-full bg-[#F1C40F] h-full" style="width: 85%;"></div></div>
+<p class="text-white/60 text-[13px] font-medium leading-normal">Blue-Eyes White Dragon</p>
+<div class="h-2 rounded-full bg-white/10"><div class="rounded-full bg-[#9B59B6] h-full" style="width: 78%;"></div></div>
+<p class="text-white/60 text-[13px] font-medium leading-normal">Pikachu Illustrator</p>
+<div class="h-2 rounded-full bg-white/10"><div class="rounded-full bg-[#1ABC9C] h-full" style="width: 72%;"></div></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-6">
+<h3 class="text-white text-base font-medium leading-normal">Recent Sales Activity</h3>
+<div class="flex-1 overflow-y-auto -mr-6 pr-6">
+<table class="w-full text-sm text-left text-white/60">
+<thead class="text-xs text-white/80 uppercase">
+<tr>
+<th class="py-2" scope="col">Card Name</th>
+<th class="py-2 text-right" scope="col">Price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-white/10">
+<td class="py-3 font-medium text-white whitespace-nowrap">Mox Sapphire</td>
+<td class="py-3 text-right">$2,500.00</td>
+</tr>
+<tr class="border-b border-white/10">
+<td class="py-3 font-medium text-white whitespace-nowrap">Dark Magician</td>
+<td class="py-3 text-right">$120.00</td>
+</tr>
+<tr class="border-b border-white/10">
+<td class="py-3 font-medium text-white whitespace-nowrap">Ancestral Recall</td>
+<td class="py-3 text-right">$1,800.00</td>
+</tr>
+<tr class="border-b border-white/10">
+<td class="py-3 font-medium text-white whitespace-nowrap">Venusaur</td>
+<td class="py-3 text-right">$350.00</td>
+</tr>
+<tr class="border-b border-white/10">
+<td class="py-3 font-medium text-white whitespace-nowrap">Exodia the Forbidden One</td>
+<td class="py-3 text-right">$250.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</div>
+</body></html>

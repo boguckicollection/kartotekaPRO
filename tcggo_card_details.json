@@ -1,0 +1,56 @@
+{
+  "id": 21421,
+  "name": "Pikachu ex",
+  "name_numbered": "Pikachu ex 28",
+  "slug": "pikachu-ex",
+  "type": "singles",
+  "card_number": 28,
+  "hp": 190,
+  "rarity": "Double Rare",
+  "supertype": "Pokémon",
+  "tcgid": "sv8pt5-28",
+  "prices": {
+    "cardmarket": {
+      "currency": "EUR",
+      "lowest_near_mint": 0.6,
+      "lowest_near_mint_DE": 0.99,
+      "lowest_near_mint_FR": 1.6,
+      "graded": []
+    }
+  },
+  "episode": {
+    "id": 212,
+    "name": "Prismatic Evolutions",
+    "slug": "prismatic-evolutions",
+    "released_at": "2025-01-17",
+    "logo": "https://images.tcggo.com/tcggo/storage/21414/prismatic-evolutions-logo.png",
+    "code": "PRE",
+    "cards_total": 180,
+    "cards_printed_total": 131,
+    "prices": {
+      "cardmarket": {
+        "total": 3401.35,
+        "currency": "EUR"
+      },
+      "tcgplayer": {
+        "total": 0,
+        "currency": "EUR"
+      }
+    },
+    "game": {
+      "name": "Pokémon",
+      "slug": "pokemon"
+    },
+    "series": {
+      "id": 1,
+      "name": "Scarlet & Violet",
+      "slug": "scarlet-violet"
+    }
+  },
+  "artist": null,
+  "image": "https://images.tcggo.com/tcggo/storage/21443/pikachu-ex-pre-28-prismatic-evolutions.png",
+  "tcggo_url": "https://www.tcggo.com/pokemon/prismatic-evolutions/pikachu-ex-28",
+  "links": {
+    "cardmarket": "https://www.tcggo.com/external/cm/21421"
+  }
+}

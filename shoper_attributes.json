@@ -1,0 +1,248 @@
+{
+    "items": [
+        {
+            "attribute_id": "38",
+            "name": "Rzadko\u015b\u0107",
+            "options": [
+                {
+                    "option_id": "115",
+                    "value": "Common"
+                },
+                {
+                    "option_id": "116",
+                    "value": "Uncommon"
+                },
+                {
+                    "option_id": "117",
+                    "value": "Rare"
+                },
+                {
+                    "option_id": "137",
+                    "value": "Double Rare"
+                },
+                {
+                    "option_id": "145",
+                    "value": "Promo"
+                },
+                {
+                    "option_id": "162",
+                    "value": "Illustration Rare"
+                },
+                {
+                    "option_id": "163",
+                    "value": "Secial Illustration Rare"
+                },
+                {
+                    "option_id": "164",
+                    "value": "Hyper Rare"
+                },
+                {
+                    "option_id": "165",
+                    "value": "Ace Spec"
+                },
+                {
+                    "option_id": "171",
+                    "value": "Ultra Rare"
+                },
+                {
+                    "option_id": "173",
+                    "value": "Shiny"
+                }
+            ]
+        },
+        {
+            "attribute_id": "39",
+            "name": "Typ karty",
+            "options": [
+                {
+                    "option_id": "118",
+                    "value": "Pok\u00e9mon EX"
+                },
+                {
+                    "option_id": "119",
+                    "value": "Pok\u00e9mon GX"
+                },
+                {
+                    "option_id": "120",
+                    "value": "Pok\u00e9mon V"
+                },
+                {
+                    "option_id": "121",
+                    "value": "Pok\u00e9mon VMAX"
+                },
+                {
+                    "option_id": "122",
+                    "value": "Pok\u00e9mon VSTAR"
+                },
+                {
+                    "option_id": "124",
+                    "value": " Pok\u00e9mon Signed"
+                },
+                {
+                    "option_id": "136",
+                    "value": "Trener (Trainer)"
+                },
+                {
+                    "option_id": "139",
+                    "value": "Pok\u00e9mon Tool (Trainer)"
+                },
+                {
+                    "option_id": "141",
+                    "value": "Energia (Energy)"
+                },
+                {
+                    "option_id": "168",
+                    "value": "Supporter (Trainer)"
+                },
+                {
+                    "option_id": "169",
+                    "value": "Item (Trainer)"
+                },
+                {
+                    "option_id": "174",
+                    "value": "Stadium (Trainer)"
+                }
+            ]
+        },
+        {
+            "attribute_id": "63",
+            "name": "Energia",
+            "options": [
+                {
+                    "option_id": "125",
+                    "value": "Grass"
+                },
+                {
+                    "option_id": "126",
+                    "value": "Fire"
+                },
+                {
+                    "option_id": "127",
+                    "value": "Water"
+                },
+                {
+                    "option_id": "128",
+                    "value": "Lightning"
+                },
+                {
+                    "option_id": "129",
+                    "value": "Psychic"
+                },
+                {
+                    "option_id": "130",
+                    "value": "Fighting"
+                },
+                {
+                    "option_id": "131",
+                    "value": "Darkness"
+                },
+                {
+                    "option_id": "132",
+                    "value": "Metal"
+                },
+                {
+                    "option_id": "133",
+                    "value": "Fairy"
+                },
+                {
+                    "option_id": "134",
+                    "value": "Dragon"
+                },
+                {
+                    "option_id": "135",
+                    "value": "Normal"
+                }
+            ]
+        },
+        {
+            "attribute_id": "64",
+            "name": "J\u0119zyk",
+            "options": [
+                {
+                    "option_id": "142",
+                    "value": "Angielski"
+                },
+                {
+                    "option_id": "143",
+                    "value": "Japo\u0144ski"
+                },
+                {
+                    "option_id": "144",
+                    "value": "Chi\u0144ski"
+                },
+                {
+                    "option_id": "148",
+                    "value": "Niemiecki"
+                }
+            ]
+        },
+        {
+            "attribute_id": "65",
+            "name": "Wyko\u0144czenie",
+            "options": [
+                {
+                    "option_id": "149",
+                    "value": "Holo"
+                },
+                {
+                    "option_id": "150",
+                    "value": "Reverse Holo"
+                },
+                {
+                    "option_id": "151",
+                    "value": "Full Art"
+                },
+                {
+                    "option_id": "155",
+                    "value": "Pok\u00e9Ball Pattern"
+                },
+                {
+                    "option_id": "156",
+                    "value": "MasterBall Pattern"
+                },
+                {
+                    "option_id": "157",
+                    "value": "Gold (z\u0142ota karta)"
+                },
+                {
+                    "option_id": "158",
+                    "value": "Rainbow (t\u0119czowa karta)"
+                }
+            ]
+        },
+        {
+            "attribute_id": "66",
+            "name": "Jako\u015b\u0107",
+            "options": [
+                {
+                    "option_id": "175",
+                    "value": "Mint"
+                },
+                {
+                    "option_id": "176",
+                    "value": "Near Mint"
+                },
+                {
+                    "option_id": "177",
+                    "value": "Exellent"
+                },
+                {
+                    "option_id": "178",
+                    "value": "Good"
+                },
+                {
+                    "option_id": "179",
+                    "value": "Light Played"
+                },
+                {
+                    "option_id": "180",
+                    "value": "Played"
+                },
+                {
+                    "option_id": "181",
+                    "value": "Poor"
+                }
+            ]
+        }
+    ]
+}

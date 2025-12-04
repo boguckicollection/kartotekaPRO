@@ -1,0 +1,101 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cardscan_api
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=${APP_NAME:-Card Scanner API}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - UPLOAD_DIR=${UPLOAD_DIR:-/app/storage/uploads}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/storage/app.db}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - SHOPER_BASE_URL=${SHOPER_BASE_URL:-}
+      - SHOPER_ACCESS_TOKEN=${SHOPER_ACCESS_TOKEN:-}
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY:-}
+      - RAPIDAPI_HOST=${RAPIDAPI_HOST:-pokemon-tcg-api.p.rapidapi.com}
+      - TCGGO_BASE_URL=${TCGGO_BASE_URL:-https://pokemon-tcg-api.p.rapidapi.com}
+      - TCGGO_SEARCH_PATH=${TCGGO_SEARCH_PATH:-/cards}
+      - TCGGO_SEARCH_SEARCH_PATH=${TCGGO_SEARCH_SEARCH_PATH:-/cards/search}
+      - TCGGO_SORT=${TCGGO_SORT:-episode_newest}
+      - EUR_PLN_RATE=${EUR_PLN_RATE:-4.3}
+      - PRICE_MULTIPLIER=${PRICE_MULTIPLIER:-1.24}
+      - PUBLISH_DRY_RUN=${PUBLISH_DRY_RUN:-false}
+      - DEFAULT_TAX_ID=${DEFAULT_TAX_ID:-1}
+      - DEFAULT_PRODUCER_ID=${DEFAULT_PRODUCER_ID:-23}
+      - DEFAULT_LANG_ID=${DEFAULT_LANG_ID:-1}
+      - DEFAULT_LANGUAGE_CODE=${DEFAULT_LANGUAGE_CODE:-pl_PL}
+      - DEFAULT_AVAILABILITY_ID=${DEFAULT_AVAILABILITY_ID:-2}
+      - CODE_PREFIX=${CODE_PREFIX:-PKM}
+      - IMAGE_NAME_TEMPLATE=${IMAGE_NAME_TEMPLATE:-{name}-{number}.jpg}
+      - SET_CATEGORY_MAP=${SET_CATEGORY_MAP:-}
+      - NTFY_ENABLED=${NTFY_ENABLED:-false}
+      - NTFY_URL=${NTFY_URL:-http://ntfy}
+      - NTFY_TOPIC=${NTFY_TOPIC:-kartoteka-orders}
+      - NTFY_PRIORITY=${NTFY_PRIORITY:-urgent}
+      - NTFY_AUTH_TOKEN=${NTFY_AUTH_TOKEN:-}
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:5173}
+    volumes:
+      - ./storage:/app/storage
+      - ./ids_dump.json:/app/ids_dump.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cardscan_frontend
+    environment:
+    - HTTPS=false
+    - SSL_CRT_FILE=/app/certs/dev.crt
+    - SSL_KEY_FILE=/app/certs/dev.key
+    - API_PROXY_TARGET=http://api:8000
+    - VITE_API_BASE_URL=/api
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./frontend/certs:/app/certs:ro  
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: kartoteka_ntfy
+    profiles: [ntfy]  # Only start if explicitly requested with --profile ntfy
+    command:
+      - serve
+      - --config
+      - /etc/ntfy/server.yml
+    environment:
+      - NTFY_BASE_URL=${NTFY_BASE_URL:-http://localhost:8080}
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_AUTH_FILE=/var/cache/ntfy/auth.db
+      - NTFY_AUTH_DEFAULT_ACCESS=${NTFY_AUTH_DEFAULT_ACCESS:-write-only}
+      - NTFY_ENABLE_LOGIN=true
+      - NTFY_BEHIND_PROXY=true
+    volumes:
+      - ./storage/ntfy-cache:/var/cache/ntfy
+      - ./storage/ntfy-config:/etc/ntfy
+    ports:
+      - "${NTFY_PORT:-8080}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+volumes: {}

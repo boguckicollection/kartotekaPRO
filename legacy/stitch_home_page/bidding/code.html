@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TCG Trading - Bidding</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1A237E",
+                        "secondary": "#FFD700",
+                        "background-light": "#F5F5F5",
+                        "background-dark": "#121212",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#333333] dark:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-700 px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-black dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined !text-4xl">style</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">TCG Trading</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-gray-500 flex border-none bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-100 dark:bg-gray-800 focus:border-none h-full placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-sm font-medium leading-normal text-black dark:text-white" href="#">Dashboard</a>
+<a class="text-sm font-medium leading-normal text-black dark:text-white" href="#">Inventory</a>
+<a class="text-sm font-medium leading-normal text-primary dark:text-secondary" href="#">Bidding</a>
+<a class="text-sm font-medium leading-normal text-black dark:text-white" href="#">Customers</a>
+</div>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-gray-100 dark:bg-gray-800 text-black dark:text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOowR85cw7Udbkf1VomtF7_481UGSuuSoIjRxuXt7t9ULdsYwiDv861NS-2xVgbedgntvZWFfJ-ActZGLXldIa2K5L2QMo9odjhu0KdwLYFSZfkdOnltyn71roa7bxufesWvPO_7w6HSkLtLm-qOVbaqfh1Xh8a4g4kA0CmRsuLm_8oXW57wLXdLmmb96GZug5weVZqCmsomNA0GuuLAK23yjnIXp98Rljeho7u20D67c-sPFnoKMm2dy7-2Ac_NI8_CZkJVQjJCad");'></div>
+</div>
+</header>
+<main class="flex-1 p-10">
+<div class="flex flex-wrap justify-between gap-3 mb-6">
+<p class="text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Bidding</p>
+</div>
+<div class="flex gap-8">
+<!-- Left side: Auction List -->
+<div class="w-1/2">
+<div class="flex gap-3 mb-4 overflow-x-auto pb-2">
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-100 dark:bg-gray-800 pl-4 pr-2 text-black dark:text-white">
+<p class="text-sm font-medium leading-normal">All</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-100 dark:bg-gray-800 pl-4 pr-2 text-black dark:text-white">
+<p class="text-sm font-medium leading-normal">Magic: The Gathering</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-100 dark:bg-gray-800 pl-4 pr-2 text-black dark:text-white">
+<p class="text-sm font-medium leading-normal">Pokémon</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-100 dark:bg-gray-800 pl-4 pr-2 text-black dark:text-white">
+<p class="text-sm font-medium leading-normal">Yu-Gi-Oh!</p>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-100 dark:bg-gray-800 pl-4 pr-2 text-black dark:text-white">
+<p class="text-sm font-medium leading-normal">Ending Soon</p>
+</button>
+</div>
+<div class="flex overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark">
+<table class="flex-1">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-4 py-3 text-left text-sm font-medium w-2/5">Card Name</th>
+<th class="px-4 py-3 text-left text-sm font-medium w-1/5">Current Bid</th>
+<th class="px-4 py-3 text-left text-sm font-medium w-1/5">Time Left</th>
+<th class="px-4 py-3 text-left text-sm font-medium w-1/5">Bidders</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-t border-t-gray-200 dark:border-t-gray-700 bg-primary/10 dark:bg-primary/20 cursor-pointer">
+<td class="h-[72px] px-4 py-2 flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded w-10 h-10" data-alt="Black Lotus card" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCZEuJge8tIMWPLdKSzJkv_d0by1AudBEAYkVAg7su9xbWcRnyO8wiGu5SoV2Zn0flixz5LqaB2CbU0WpaN6BQA7I-Kkce38Q2bCe3J5N5txA5nsV3rzr6PrdJvUkkN97rnYr9R-b55vHgHY-o8exCe9VBeGc0__Vf5wFsgNTXZAQXFwwsr3IEJzZHDXf6nXo8O6LoWZ3lUVLZPXY9OG_4n0DnDTIniLBlSfyEZL8mFUnv3lePH1QlBHhcBI1-msRYPVRB3DQ41GDfp");'></div>
+<span class="font-semibold">Black Lotus</span>
+</td>
+<td class="h-[72px] px-4 py-2 text-sm">$25,000</td>
+<td class="h-[72px] px-4 py-2 text-sm">2h 15m</td>
+<td class="h-[72px] px-4 py-2 text-sm">22</td>
+</tr>
+<tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer">
+<td class="h-[72px] px-4 py-2 flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded w-10 h-10" data-alt="Charizard card" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuALw_WkukTKr1mRA4jAIUjRnS0UULHEmOnu4qglAPHvCetbgV2NwHrOV3F6Dk3FijfwNJLaCpAwWP5XG4GN2kMradqnBqE8nEOKI1xjugUhjOr4-sQ2tqnFXEmMkhS5PNDLR82qVeemiZlxBvzT_cJdJS0rTOYn8p-FaWcGlFgh03b3ILPPJr-FmEAR0t1RDG3QFb3ZjHQe_aBEKTw0kzxM_ERfu1Jha0q9_6epJYdQ_cZqERhhK1z5iom1rynTk3i7D2reutCURiV5");'></div>
+<span>Charizard (1st Edition)</span>
+</td>
+<td class="h-[72px] px-4 py-2 text-sm">$5,200</td>
+<td class="h-[72px] px-4 py-2 text-sm">4h 30m</td>
+<td class="h-[72px] px-4 py-2 text-sm">12</td>
+</tr>
+<tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer">
+<td class="h-[72px] px-4 py-2 flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded w-10 h-10" data-alt="Blue-Eyes White Dragon card" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuArjLoCJTf4yTwKgSsdDxxxsBRsaTtZeXsTvkF6BZez5pv7r4pk7foydqe-2dzF0X8N0rU_jgFEBo28AjJf4tg6ErdHHvDIhPFNHiZJV4n3lcGQ037tkXmrEnCLTkdPphm8GmaYMu54Vxg1tgbe3Zowo-xaBCPdnh4pFQ0snVYaX9ujtKbiJqdnoi5lcIFSPZuvA4GS5O2ALz8_5r0GPt46h_JOyNaHygC6LBIHiRBAgnbkgA9aoNTSP8bRL0K0MSylkQZ0gb85ASj4");'></div>
+<span>Blue-Eyes White Dragon</span>
+</td>
+<td class="h-[72px] px-4 py-2 text-sm">$1,800</td>
+<td class="h-[72px] px-4 py-2 text-sm">1d 2h</td>
+<td class="h-[72px] px-4 py-2 text-sm">8</td>
+</tr>
+<tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer">
+<td class="h-[72px] px-4 py-2 flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded w-10 h-10" data-alt="Pikachu Illustrator card" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBU1jQf8qIfuMOvIwMLK5bUVKKgwA-ieeD6xtvgC3vYFRtzVBVx_Nu1oyXH39QvbmobLyL0Dxh3fU6o_UlWscunhcV6ChbY5Fg92wBXtDwa8ckP6JGLJ1mi4XzOJ86SxMmxHckwR1SbJLCIKKB6hBPM3D31UFWLVULUbmC1wC-mjodZR0HZi0d3VNb6NYLBxSVlfV-s80KJoCr7kcUeRX33r-9LIaSsZ8bDWVnlYGLaRVGrbhnKeG23jbOvp9tKiM0nX6IMtscoJkyC");'></div>
+<span>Pikachu Illustrator</span>
+</td>
+<td class="h-[72px] px-4 py-2 text-sm">$1,200</td>
+<td class="h-[72px] px-4 py-2 text-sm">2d 8h</td>
+<td class="h-[72px] px-4 py-2 text-sm">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-8">
+<h2 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4">My Bids</h2>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+<div>
+<p class="font-semibold">Time Walk</p>
+<p class="text-sm text-gray-600 dark:text-gray-400">Current Bid: $1,500</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-green-600 dark:text-green-400">Winning</p>
+<p class="text-xs text-gray-500">Ends in 3h 45m</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+<div>
+<p class="font-semibold">Mox Sapphire</p>
+<p class="text-sm text-gray-600 dark:text-gray-400">Your Bid: $8,000</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-red-600 dark:text-red-400">Outbid</p>
+<p class="text-xs text-gray-500">Current bid: $8,250</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right side: Auction Details -->
+<div class="w-1/2">
+<div class="bg-gray-50 dark:bg-gray-800/30 rounded-xl p-6">
+<h2 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4">Black Lotus</h2>
+<div class="flex gap-6">
+<div class="w-1/3">
+<img class="rounded-lg w-full" data-alt="Black Lotus card full view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_v1zq2Xl8L0CQg5vy4ol3w7KPSw_Kk_mBXc6JphN3FL0K_qvjCZ_R8_wTKzPwDJeMUsSIrY4h4uBpt7BgrXg6RTdA6oLh8qB4Ic10NIzQdPFcVLmrRGpy32lBCagSBM-EBDKwCFEU2aKdQhFYf59AnBEAbNEWrqdxhzd3ZNqqrS6ZVf9rbIeRbunPJeChB0qkmZV61_Rb_TGefzGOChsFee3ZTezUz1v7OYqjwNmcafSeIbSs8TexEUkeginEgeEWT0M3l2wSCq0x"/>
+</div>
+<div class="w-2/3 flex flex-col">
+<div class="flex-grow">
+<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Alpha Edition, Near Mint condition. One of the most iconic and powerful cards in Magic: The Gathering history.</p>
+<div class="grid grid-cols-2 gap-4 text-sm mb-4">
+<div><span class="font-semibold">Current Bid:</span><br/>$25,000</div>
+<div><span class="font-semibold">Time Remaining:</span><br/>2h 15m 32s</div>
+<div><span class="font-semibold">Bidders:</span><br/>22</div>
+<div><span class="font-semibold">Bid Increment:</span><br/>$250</div>
+</div>
+<div class="mt-4">
+<label class="block text-sm font-medium mb-1" for="bid-amount">Your Bid Amount</label>
+<div class="flex">
+<span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500">$</span>
+<input class="flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:ring-primary focus:border-primary" id="bid-amount" name="bid-amount" placeholder="25250.00" type="text"/>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 flex items-center justify-center gap-2 h-12 rounded-lg bg-secondary text-black font-bold text-lg hover:bg-yellow-400 transition-colors">
+<span class="material-symbols-outlined">gavel</span>
+                                    Place Bid
+                                </button>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-bold mb-3">Bidding History</h3>
+<div class="space-y-3 max-h-48 overflow-y-auto pr-2">
+<div class="flex justify-between text-sm p-2 rounded bg-gray-100 dark:bg-gray-700/50">
+<p><span class="font-semibold">UserA123</span> placed a bid.</p>
+<p class="text-right"><span class="font-bold">$25,000</span><br/><span class="text-xs text-gray-500">2 min ago</span></p>
+</div>
+<div class="flex justify-between text-sm p-2">
+<p><span class="font-semibold text-green-500">You</span> placed a bid.</p>
+<p class="text-right"><span class="font-bold text-green-500">$24,750</span><br/><span class="text-xs text-gray-500">5 min ago</span></p>
+</div>
+<div class="flex justify-between text-sm p-2 rounded bg-gray-100 dark:bg-gray-700/50">
+<p><span class="font-semibold">CollectorZ</span> placed a bid.</p>
+<p class="text-right"><span class="font-bold">$24,500</span><br/><span class="text-xs text-gray-500">8 min ago</span></p>
+</div>
+<div class="flex justify-between text-sm p-2">
+<p><span class="font-semibold">MTGFanatic</span> placed a bid.</p>
+<p class="text-right"><span class="font-bold">$24,250</span><br/><span class="text-xs text-gray-500">11 min ago</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="text-center p-4 text-xs text-gray-500 border-t border-gray-200 dark:border-gray-700">
+<p>© 2023 TCG Trading. All rights reserved. | <a class="hover:underline" href="#">Help/FAQ</a> | <a class="hover:underline" href="#">Contact Us</a> | <a class="hover:underline" href="#">Terms of Service</a></p>
+</footer>
+</div>
+</body></html>

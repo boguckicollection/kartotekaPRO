@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Card Valuation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3A7CA5",
+                        "secondary": "#FFD700",
+                        "background-light": "#F5F5F5",
+                        "background-dark": "#101922",
+                        "text-light": "#333333",
+                        "text-dark": "#F5F5F5"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-20 xl:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-5xl flex-1">
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex flex-col gap-3">
+<p class="text-text-light dark:text-text-dark text-4xl font-black leading-tight tracking-[-0.033em]">Card Pricing</p>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Enter the card name and number to get its market price.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Card Name</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-primary h-14 placeholder:text-gray-400 dark:placeholder-gray-500 p-[15px] text-base font-normal leading-normal" placeholder="e.g., Charizard" value=""/>
+</label>
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Card Number</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-primary h-14 placeholder:text-gray-400 dark:placeholder-gray-500 p-[15px] text-base font-normal leading-normal" placeholder="e.g., 4/102" value=""/>
+</label>
+</div>
+<div class="flex px-4 py-3">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Get Pricing</span>
+</button>
+</div>
+<div class="p-4 mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-1">
+<img alt="Pokémon card" class="w-full rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYwMddgd_HinxzixgT19XUkCC-CD7cnOBA17KOq3AQCTOAogavWgBm7-5Um8Q2ThBhUgirYbTEk2_H3f-tmrG_nhvjEWOhOHtmKES9nRn6kmTmLWfllcpj2GRfiqqv0tRWIfPD_knBfizDbUTs8rGYM4T1dipkHqAPMRxr7Nf6T6fgVlqez3NSk40-5Nmu0qJqv6KAM8vK042EgNulm7I8GasePap_SMh8EqOSXtdo4mWUls2UGahBqeDUDVav3z2vyKZPSSNNZ5_B"/>
+</div>
+<div class="md:col-span-2">
+<h2 class="text-3xl font-bold">Charizard #4</h2>
+<p class="text-gray-500 dark:text-gray-400 mt-1">Base Set - Holo Rare</p>
+<div class="grid grid-cols-2 gap-6 mt-6">
+<div>
+<p class="text-lg text-gray-500 dark:text-gray-400">Market Price</p>
+<p class="text-4xl font-bold text-secondary">$425.00</p>
+</div>
+<div>
+<p class="text-lg text-gray-500 dark:text-gray-400">Suggested Purchase Price (80%)</p>
+<p class="text-4xl font-bold text-primary">$340.00</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 mt-8">
+<h2 class="text-2xl font-bold mb-4">Price Fluctuation (Last 30 Days)</h2>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+<img class="w-full h-auto" data-alt="A line chart showing price history over time" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU2k7kxV8L1ORZNEzvSPyjAys7zHvhJoDgSxzntzjuFNg5H-4eLOohefectNALG_1yiLhd0afV3zZdKXzdMdrl8X1mFJHQiqXgT3zP0JRljqZ_VyNzqcWplTXcOdk8jc0TyAaAgPY0SbxOErjeNfkwAyUrV5SSv6XFhYk8FdMOErnFXhWIRV7O9rgUTV3apIvBgQOSL14RWkrqmQMtJrAtnshiUYaeQMjQS3ss2O1wiSQ2vIwFAEI_Xva1Rq303QakJgdc8Gx9G2I1"/>
+<p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">Data from TCGGO API and CardMarket</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row gap-4 p-4 mt-8">
+<button class="flex items-center justify-center gap-2 flex-1 min-w-[84px] cursor-pointer overflow-hidden rounded-lg h-12 px-5 bg-secondary text-gray-900 text-base font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+<span class="truncate">Add to Purchase List</span>
+</button>
+<button class="flex items-center justify-center gap-2 flex-1 min-w-[84px] cursor-pointer overflow-hidden rounded-lg h-12 px-5 border border-primary text-primary text-base font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined">refresh</span>
+<span class="truncate">Start New Search</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

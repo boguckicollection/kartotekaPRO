@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TCG Store - Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap');
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3498DB",
+                        "background-light": "#ECF0F1",
+                        "background-dark": "#101922",
+                        "secondary-light": "#BDC3C7",
+                        "secondary-dark": "#7F8C8D",
+                        "accent-green": "#2ECC71",
+                        "accent-orange": "#E67E22"
+                    },
+                    fontFamily: {
+                        "display": ["Lato", "Open Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="w-64 bg-white dark:bg-[#111418] p-4 flex flex-col justify-between shadow-lg">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Admin avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqhdQWGuc5BcMyEtS2S8Wg6uRbLl5l7XxovLsQvYOdqRDi1Ryf85QEfaINKp0hluv9MMyR7hptQwvbSCngHSskH3pJTNZjzXQjKWC5OOAcJvlTHYhuvnkH_EQ5n_BuJoxskg7f7d2LY4B8SWfIj0bm-xUdSUqDGTsJuIeEYB0IJHpfRRIbbJ4aHrotidmJM0zKkmH5etsaCq0WIgssQBP7y6ZBrbETPTdOBXqBGGFP5ypcsYbONzMx4cmvswwlK6UWHvSeV1Ty63dH");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-800 dark:text-white text-base font-bold leading-normal">Admin</h1>
+<p class="text-secondary-dark dark:text-secondary-light text-sm font-normal leading-normal">admin@tcgstore.com</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-bold leading-normal">Reports</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<p class="text-sm font-medium leading-normal">Inventory</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium leading-normal">Customers</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<p class="text-sm font-medium leading-normal">Financials</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide">
+<span class="truncate">New Report</span>
+</button>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<p class="text-sm font-medium leading-normal">Help</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8 overflow-y-auto">
+<!-- PageHeading -->
+<header class="flex flex-wrap justify-between items-center gap-4 mb-6">
+<div class="flex flex-col gap-1">
+<h1 class="text-gray-900 dark:text-white text-4xl font-bold tracking-tight">Reports</h1>
+<p class="text-secondary-dark dark:text-secondary-light text-base font-normal">Insights and analytics for your TCG store</p>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm font-bold leading-normal tracking-wide">
+<span class="material-symbols-outlined mr-2">ios_share</span>
+<span class="truncate">Export to CSV</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-sm font-bold leading-normal tracking-wide">
+<span class="material-symbols-outlined mr-2">picture_as_pdf</span>
+<span class="truncate">Download as PDF</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide">
+<span class="material-symbols-outlined mr-2">event_repeat</span>
+<span class="truncate">Schedule Report</span>
+</button>
+</div>
+</header>
+<!-- SearchBar & Filters -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+<div class="flex-1">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-secondary-dark dark:text-secondary-light flex border-none bg-white dark:bg-[#111418] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-800 dark:text-white focus:outline-0 focus:ring-0 border-none bg-white dark:bg-[#111418] focus:border-none h-full placeholder:text-secondary-dark dark:placeholder:text-secondary-light px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search for a report" value=""/>
+</div>
+</label>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-2">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-[#111418] px-3">
+<span class="material-symbols-outlined text-secondary-dark dark:text-secondary-light">calendar_today</span>
+<p class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Date Range: Last 30 Days</p>
+<span class="material-symbols-outlined text-secondary-dark dark:text-secondary-light">arrow_drop_down</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-[#111418] px-3">
+<span class="material-symbols-outlined text-secondary-dark dark:text-secondary-light">filter_list</span>
+<p class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Filters</p>
+<span class="material-symbols-outlined text-secondary-dark dark:text-secondary-light">arrow_drop_down</span>
+</button>
+</div>
+</div>
+<!-- Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#111418] border border-gray-200 dark:border-gray-700">
+<p class="text-gray-600 dark:text-gray-300 text-base font-medium leading-normal">Total Revenue</p>
+<p class="text-gray-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">$45,231.89</p>
+<p class="text-accent-green text-base font-medium leading-normal flex items-center"><span class="material-symbols-outlined text-lg">arrow_upward</span>+20.1% from last month</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#111418] border border-gray-200 dark:border-gray-700">
+<p class="text-gray-600 dark:text-gray-300 text-base font-medium leading-normal">Average Order Value</p>
+<p class="text-gray-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">$89.50</p>
+<p class="text-accent-green text-base font-medium leading-normal flex items-center"><span class="material-symbols-outlined text-lg">arrow_upward</span>+5.2% from last month</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#111418] border border-gray-200 dark:border-gray-700">
+<p class="text-gray-600 dark:text-gray-300 text-base font-medium leading-normal">New Customers</p>
+<p class="text-gray-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">1,204</p>
+<p class="text-accent-green text-base font-medium leading-normal flex items-center"><span class="material-symbols-outlined text-lg">arrow_upward</span>+12.8% from last month</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#111418] border border-gray-200 dark:border-gray-700">
+<p class="text-gray-600 dark:text-gray-300 text-base font-medium leading-normal">Inventory Turnover</p>
+<p class="text-gray-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">3.5</p>
+<p class="text-accent-orange text-base font-medium leading-normal flex items-center"><span class="material-symbols-outlined text-lg">arrow_downward</span>-1.2% from last month</p>
+</div>
+</div>
+<!-- Charts and Tables -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Sales Over Time -->
+<div class="bg-white dark:bg-[#111418] rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Sales Over Time</h3>
+<div class="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+<img class="w-full h-full object-cover rounded-lg" data-alt="Line chart showing sales trends over the last 30 days" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHzb6jNZXD4P9TJ2LKX_Pn6GOnXCtgiK3IJV_XQwhXAX47WYFckNn0JhbB0Ysffl8Gr6txq958gxEh7hZ_yPkW5flf9LD9h0HEmXvkGa6eIOj4V0nBd-Dp1fiYmcWhQdgOKrFhPFhh6NWHUi0zwuY0EYfjx0pPjABLwkxf1DeTAI3kCURx1Dk6wp53wDGd4sRyqy7Z2qeuufHgm3ng0QNirCiHiTEIno9Q8oSH5JLEzIIs02SiPjGJ_glLfrhU5Lo-rG7KC5St0osy"/>
+</div>
+</div>
+<!-- Top Selling Products -->
+<div class="bg-white dark:bg-[#111418] rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Top Selling Products</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<span class="w-2/3 text-gray-600 dark:text-gray-300">Black Lotus</span>
+<div class="w-1/3 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-2/3 text-gray-600 dark:text-gray-300">Mox Sapphire</span>
+<div class="w-1/3 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 70%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-2/3 text-gray-600 dark:text-gray-300">Time Walk</span>
+<div class="w-1/3 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-2/3 text-gray-600 dark:text-gray-300">Ancestral Recall</span>
+<div class="w-1/3 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 55%"></div>
+</div>
+</div>
+<div class="flex items-center">
+<span class="w-2/3 text-gray-600 dark:text-gray-300">Mox Jet</span>
+<div class="w-1/3 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 40%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Current Stock Levels Table -->
+<div class="bg-white dark:bg-[#111418] rounded-xl p-6 border border-gray-200 dark:border-gray-700 lg:col-span-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Current Stock Levels</h3>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+<tr>
+<th class="px-6 py-3" scope="col">Product Name</th>
+<th class="px-6 py-3" scope="col">SKU</th>
+<th class="px-6 py-3" scope="col">Stock</th>
+<th class="px-6 py-3" scope="col">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b dark:bg-[#111418] dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">Black Lotus</th>
+<td class="px-6 py-4">BL-ALPHA-001</td>
+<td class="px-6 py-4">3</td>
+<td class="px-6 py-4"><span class="bg-accent-green/20 text-accent-green text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">In Stock</span></td>
+</tr>
+<tr class="bg-white border-b dark:bg-[#111418] dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">Lightning Bolt</th>
+<td class="px-6 py-4">LB-BETA-045</td>
+<td class="px-6 py-4">1</td>
+<td class="px-6 py-4"><span class="bg-accent-orange/20 text-accent-orange text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Low Stock</span></td>
+</tr>
+<tr class="bg-white border-b dark:bg-[#111418] dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">Shivan Dragon</th>
+<td class="px-6 py-4">SD-UNL-112</td>
+<td class="px-6 py-4">12</td>
+<td class="px-6 py-4"><span class="bg-accent-green/20 text-accent-green text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">In Stock</span></td>
+</tr>
+<tr class="bg-white dark:bg-[#111418]">
+<th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">Counterspell</th>
+<td class="px-6 py-4">CS-REV-021</td>
+<td class="px-6 py-4">0</td>
+<td class="px-6 py-4"><span class="bg-red-500/20 text-red-500 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Out of Stock</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,380 @@
+
+
+@app.get("/scans", response_model=list[ScanHistoryItem])
+def list_scans(limit: int = 20):
+    db = SessionLocal()
+    try:
+        rows = (
+            db.query(Scan)
+            .order_by(Scan.id.desc())
+            .limit(max(1, min(limit, 100)))
+            .all()
+        )
+        items: list[ScanHistoryItem] = []
+        for s in rows:
+            selected = None
+            if s.selected_candidate_id:
+                c = db.get(ScanCandidate, s.selected_candidate_id)
+                if c:
+                    selected = Candidate(
+                        id=c.provider_id,
+                        name=c.name,
+                        set=c.set,
+                        set_code=c.set_code,
+                        number=c.number,
+                        image=c.image,
+                        score=c.score,
+                    )
+            items.append(
+                ScanHistoryItem(
+                    id=s.id,
+                    created_at=s.created_at.isoformat(),
+                    detected_name=s.detected_name,
+                    detected_set=s.detected_set,
+                    detected_number=s.detected_number,
+                    selected=selected,
+                )
+            )
+        return items
+    finally:
+        db.close()
+
+
+_CATEGORY_NAMES = {
+    38: "Karty Pokémon",
+    39: "151",
+    40: "Licytacja",
+    41: "Zestawy",
+    42: "Temporal Forces",
+    43: "Obsidian Flames",
+    44: "Journey Together",
+    48: "Stellar Crown",
+    49: "Twilight Masquerade",
+    51: "Prismatic Evolutions",
+    53: "Destined Rivals",
+    55: "Scarlet & Violet",
+    56: "Paldea Evolved",
+    57: "Paradox Rift",
+    58: "Surging Sparks",
+    60: "Shrouded Fable",
+    65: "Paldean Fates",
+    66: "Evolutions",
+    70: "White Flare",
+    71: "Black Bolt",
+    72: "Scarlet & Violet",
+    74: "XY",
+    75: "Sun & Moon",
+    80: "SVP Black Star Promos",
+    89: "BREAKpoint",
+    90: "Sword & Shield",
+    91: "Vivid Voltage",
+    92: "Pokémon GO",
+    93: "Rebel Clash",
+    94: "Lost Origin",
+    95: "Shining Fates",
+    96: "Chilling Reign",
+    97: "SWSH Black Star Promos",
+    98: "BREAKthrough",
+    99: "Crown Zenith",
+    100: "Astral Radiance",
+    101: "Roaring Skies",
+    102: "Primal Clash",
+    103: "Brilliant Stars",
+    104: "Evolving Skies",
+    105: "Fusion Strike",
+    106: "Celebrations",
+    107: "Silver Tempest",
+    108: "Darkness Ablaze",
+    109: "Generations",
+    110: "Ancient Origins",
+    111: "Steam Siege",
+}
+
+
+@app.get("/products")
+async def list_products(limit: int = 50, page: int = 1, category_id: int | None = None, q: str | None = None, sort: str | None = None, order: str = "asc"):
+    db = SessionLocal()
+    try:
+        # Auto-sync on first load or after TTL expiry
+        await _sync_products_if_needed(force=False)
+        query = db.query(Product)
+        if category_id is not None:
+            query = query.filter(Product.category_id == category_id)
+        if q:
+            like = f"%{q}%"
+            query = query.filter(Product.name.ilike(like))
+        sort_map = {
+            "name": Product.name,
+            "price": Product.price,
+            "stock": Product.stock,
+            "updated_at": Product.updated_at,
+        }
+        col = sort_map.get((sort or "").lower(), Product.updated_at)
+        if (order or "").lower() == "desc":
+            query = query.order_by(col.desc().nullslast())
+        else:
+            query = query.order_by(col.asc().nullslast())
+        safe_limit = max(1, min(limit, 500))
+        safe_page = max(1, page)
+        # total count after filters
+        total_count = query.count()
+        rows = query.offset((safe_page - 1) * safe_limit).limit(safe_limit).all()
+        items = [
+            {
+                "id": r.id,
+                "shoper_id": r.shoper_id,
+                "code": r.code,
+                "name": r.name,
+                "price": r.price,
+                "stock": r.stock,
+                "image": r.image,
+                "category_id": r.category_id,
+                "category_name": _CATEGORY_NAMES.get(r.category_id),
+                "permalink": r.permalink,
+                "updated_at": r.updated_at.isoformat() if r.updated_at else None,
+            }
+            for r in rows
+        ]
+        return {"items": items, "total_count": total_count, "page": safe_page, "limit": safe_limit}
+    finally:
+        db.close()
+
+@app.get("/scans/{scan_id}", response_model=ScanDetailResponse)
+def scan_detail(scan_id: int):
+    db = SessionLocal()
+    try:
+        s = db.get(Scan, scan_id)
+        if not s:
+            return JSONResponse({"error": "scan not found"}, status_code=404)
+        # Fetch all candidates
+        cands = db.query(ScanCandidate).filter(ScanCandidate.scan_id == s.id).order_by(ScanCandidate.score.desc()).all()
+        candidates: list[Candidate] = []
+        selected_provider_id: str | None = None
+        for c in cands:
+            candidates.append(
+                Candidate(
+                    id=c.provider_id,
+                    name=c.name,
+                    set=c.set,
+                    set_code=c.set_code,
+                    number=c.number,
+                    image=c.image,
+                    score=c.score,
+                    chosen=bool(c.chosen),
+                )
+            )
+            if c.chosen:
+                selected_provider_id = c.provider_id
+
+        # Build pricing dict
+        pricing_payload = None
+        if s.cardmarket_7d_average is not None or s.price_pln_final is not None:
+            pricing_payload = {
+                "cardmarket_currency": s.cardmarket_currency,
+                "cardmarket_7d_average": s.cardmarket_7d_average,
+                "eur_pln_rate": float(settings.eur_pln_rate),
+                "multiplier": float(settings.price_multiplier),
+                "price_pln": s.price_pln,
+                "price_pln_final": s.price_pln_final,
+                "graded_psa10": s.graded_psa10,
+                "graded_currency": s.graded_currency,
+            }
+
+        # Image URL
+        image_url = None
+        try:
+            if s.stored_path:
+                image_url = f"/uploads/{Path(s.stored_path).name}"
+        except Exception:
+            pass
+
+        detected = DetectedData(
+            name=s.detected_name,
+            set=s.detected_set,
+            set_code=s.detected_set_code,
+            number=s.detected_number,
+            language=s.detected_language,
+            variant=s.detected_variant,
+            condition=s.detected_condition,
+        )
+
+        return ScanDetailResponse(
+            id=s.id,
+            created_at=s.created_at.isoformat(),
+            message=s.message,
+            detected=detected,
+            candidates=candidates,
+            selected_candidate_id=selected_provider_id,
+            pricing=pricing_payload,
+            image_url=image_url,
+        )
+    finally:
+        db.close()
+
+
+@app.post("/sync/shoper")
+async def sync_shoper(limit: int = 100):
+    if not settings.shoper_base_url or not settings.shoper_access_token:
+        return JSONResponse({"error": "Configure SHOPER_BASE_URL and SHOPER_ACCESS_TOKEN"}, status_code=400)
+    client = ShoperClient(settings.shoper_base_url, settings.shoper_access_token)
+    items = await client.fetch_all_products(limit=limit)
+    res = upsert_products(items)
+    # Update last sync marker
+    import time as _t
+    global _last_products_sync_ts
+    _last_products_sync_ts = _t.time()
+    return {"status": "ok", "fetched": len(items), **res}
+
+
+@app.get("/scans/{scan_id}/duplicates")
+def find_duplicates(scan_id: int, limit: int = 5):
+    db = SessionLocal()
+    try:
+        src = db.query(Fingerprint).filter(Fingerprint.scan_id == scan_id).first()
+        if not src:
+            return []
+        src_phash = unpack_ndarray(src.phash)
+        src_dhash = unpack_ndarray(src.dhash)
+        src_tile = unpack_ndarray(src.tile_phash)
+        rows = db.query(Fingerprint).filter(Fingerprint.scan_id != scan_id).all()
+        scored = []
+        for r in rows:
+            try:
+                ph = unpack_ndarray(r.phash)
+                dh = unpack_ndarray(r.dhash)
+                tl = unpack_ndarray(r.tile_phash)
+            except Exception:
+                continue
+            score = 0
+            score += hamming_distance(src_phash, ph)
+            score += hamming_distance(src_dhash, dh)
+            # sum tile distances (zip shape)
+            try:
+                for a, b in zip(src_tile, tl):
+                    score += hamming_distance(a, b)
+            except Exception:
+                score += 999
+            scored.append({"scan_id": r.scan_id, "distance": score})
+        scored.sort(key=lambda x: x["distance"])
+        return scored[: max(1, min(limit, 20))]
+    finally:
+        db.close()
+
+
+@app.post("/sessions/start")
+def start_session():
+    db = SessionLocal()
+    try:
+        s = ScanSession(status="open")
+        db.add(s)
+        db.flush()
+        db.commit()
+        return {"session_id": s.id}
+    finally:
+        db.close()
+
+
+@app.get("/sessions/{session_id}/summary")
+def session_summary(session_id: int):
+    db = SessionLocal()
+    try:
+        scans = db.query(Scan).filter(Scan.session_id == session_id).all()
+        total = len(scans)
+        ready = sum(1 for s in scans if s.selected_candidate_id)
+        sum_price = sum((s.price_pln_final or 0.0) for s in scans if s.selected_candidate_id)
+        return {"session_id": session_id, "total_scans": total, "ready_to_publish": ready, "sum_price_pln_final": round(sum_price, 2)}
+    finally:
+        db.close()
+
+
+@app.post("/sessions/{session_id}/publish")
+async def publish_session(session_id: int):
+    if not settings.shoper_base_url or not settings.shoper_access_token:
+        return JSONResponse({"error": "Configure SHOPER_BASE_URL and SHOPER_ACCESS_TOKEN"}, status_code=400)
+    client = ShoperClient(settings.shoper_base_url, settings.shoper_access_token)
+    db = SessionLocal()
+    published = 0
+    failed = 0
+    try:
+        scans = db.query(Scan).filter(Scan.session_id == session_id, Scan.selected_candidate_id.isnot(None)).all()
+        for s in scans:
+            cand = db.get(ScanCandidate, s.selected_candidate_id)
+            if not cand:
+                continue
+            r = await publish_scan_to_shoper(client, s, cand)
+            if r.get("ok") or r.get("dry_run"):
+                s.publish_status = "published" if not settings.publish_dry_run else "dry_run"
+                # record id if possible
+                try:
+                    resp = r.get("json") or {}
+                    sid = int(resp.get("product_id") or resp.get("id") or 0)
+                    s.published_shoper_id = sid or None
+                except Exception:
+                    pass
+                published += 1
+            else:
+                s.publish_status = "failed"
+                failed += 1
+        db.commit()
+        return {"session_id": session_id, "published": published, "failed": failed, "dry_run": settings.publish_dry_run}
+    finally:
+        db.close()
+
+
+@app.get("/scans/{scan_id}/duplicates")
+def find_duplicates(scan_id: int, limit: int = 5):
+    db = SessionLocal()
+    try:
+        src = db.query(Fingerprint).filter(Fingerprint.scan_id == scan_id).first()
+        if not src:
+            return []
+        src_phash = unpack_ndarray(src.phash)
+        src_dhash = unpack_ndarray(src.dhash)
+        src_tile = unpack_ndarray(src.tile_phash)
+        rows = db.query(Fingerprint).filter(Fingerprint.scan_id != scan_id).all()
+        scored = []
+        for r in rows:
+            try:
+                ph = unpack_ndarray(r.phash)
+                dh = unpack_ndarray(r.dhash)
+                tl = unpack_ndarray(r.tile_phash)
+            except Exception:
+                continue
+            score = 0
+            score += hamming_distance(src_phash, ph)
+            score += hamming_distance(src_dhash, dh)
+            try:
+                for a, b in zip(src_tile, tl):
+                    score += hamming_distance(a, b)
+            except Exception:
+                score += 999
+            scored.append({"scan_id": r.scan_id, "distance": score})
+        scored.sort(key=lambda x: x["distance"])
+        return scored[: max(1, min(limit, 20))]
+    finally:
+        db.close()
+
+
+@app.get("/sessions/{session_id}/publish/preview")
+def publish_preview(session_id: int):
+    db = SessionLocal()
+    try:
+        scans = db.query(Scan).filter(Scan.session_id == session_id, Scan.selected_candidate_id.isnot(None)).all()
+        payloads: list[dict] = []
+        for s in scans:
+            cand = db.get(ScanCandidate, s.selected_candidate_id)
+            if not cand:
+                continue
+            payload = build_shoper_payload(s, cand)
+            payloads.append({"scan_id": s.id, "payload": payload})
+        return {"session_id": session_id, "count": len(payloads), "payloads": payloads}
+    finally:
+        db.close()
+
+
+@app.get("/products")
+def list_products(limit: int = 50, category_id: int | None = None, q: str | None = None):
+    db = SessionLocal()
+    try:
+        query = db.query(Product)
+        if category_id is not None:

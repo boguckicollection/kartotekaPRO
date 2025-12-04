@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Warehouse Inventory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1173d4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white">
+<div class="flex h-screen">
+<aside class="w-64 bg-[#111418] p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Admin avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCxoWbkHovlSXcmCKzzbiaGnCZUBK1u4b9-fwCW_mF-Gm7yvyQM_2lXLovHkOCTmNFupa_DuZIpRuNtf6UKoQ9a6MOHFGw0S5eckfkw7FQdf47y8X15NbRxgseVd26t9ZqpNhwc5pqoi0TnyB3HVnFRdaC6S-6UTTVprTLRdBfldrKlUSVu3jEpSLqNZ7LMY79FYfHPcVRtOen5s3jVi9U_4SOlMJqmBAcJuW81lLNbx3zShmlwnz0OIS3FsmS-MT0gvHRqbel-y1Pm");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Admin</h1>
+<p class="text-[#9dabb9] text-sm font-normal leading-normal">admin@tcg.com</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-[#9dabb9] hover:bg-[#283039] hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-[#283039] text-white rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">warehouse</span>
+<p class="text-sm font-medium">Warehouse</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#9dabb9] hover:bg-[#283039] hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<p class="text-sm font-medium">Orders</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#9dabb9] hover:bg-[#283039] hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium">Customers</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Logout</span>
+</button>
+<a class="flex items-center gap-3 px-3 py-2 text-[#9dabb9] hover:bg-[#283039] hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+</div>
+</aside>
+<main class="flex-1 flex overflow-hidden">
+<div class="flex-1 flex flex-col">
+<div class="p-8 pb-0">
+<div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+<div class="flex flex-col gap-1">
+<h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">Warehouse Inventory</h1>
+<p class="text-[#9dabb9] text-base font-normal leading-normal">Manage your TCG card inventory.</p>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Add New Card</span>
+</button>
+</div>
+<div class="flex px-4 py-3 items-center justify-between">
+<div class="relative w-full max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9dabb9]">search</span>
+<input class="w-full bg-[#283039] border border-[#3b4754] rounded-lg h-10 pl-10 pr-4 text-white placeholder:text-[#9dabb9] text-sm focus:ring-primary focus:border-primary" placeholder="Search by card name..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 @container">
+<div class="grid grid-cols-1 @md:grid-cols-2 @xl:grid-cols-3 @3xl:grid-cols-4 @5xl:grid-cols-5 gap-6">
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Black Lotus card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNFvXzRZ5M8RIUr-kddYNu56_pLkdZj6wxM-Ld00XHhVkkF-K4pUyv4LZQu4fWjWvnKOwe2UTqSGULX1OgXirF38M4u1SqztqItSs8F5w2v56ElDWFmanRiKoBdUX_ddwijSFwDo_27cOde_63g211Rw9Hj11pVMKycxIR6FsvDjZvcYXgllVGBs6LEEFgmFWmMdDIUyIRxX-V5Pa20O-2MZtb0J27n2TJRRk32io2kCiq79uwlOoVjAOhK_ZxEMXimsD-gBtCRLuK"/>
+<div>
+<h3 class="font-bold text-white text-lg">Black Lotus</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 1</p>
+<p class="text-sm text-green-400 font-semibold">$100,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Charizard card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBz81s9HTNqCP0I5mhqNd4-IAJEGaXnmLolnU_5FLY0gYwayYGsTR8InnFTnOrHQjNd0XlFJ5lLeYyFP6WZMyvYl2zI60JvqaoRhzaiW4S3B9FAoDtw9t8a8zHrW3ZTF0fIlbfLcFElPm-SrDRYZQr2I1E1WVjLq7Mk3QtCr2QEpbG7X9VRdd7hutF9tDHmgEKccaasXqFuR3om1-vunWm1qEpAZLsnaFSt2DSgbJT4I3Md8BHshclEAqn4JK4Vxmizh0a7DxLsl8O"/>
+<div>
+<h3 class="font-bold text-white text-lg">Charizard (1st Ed)</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 2</p>
+<p class="text-sm text-green-400 font-semibold">$50,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Pikachu Illustrator card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh5SdQowzwXhMNhP9M7o9CfD0RbFPKtcz6-uDa_uAD1PV6D-SsQf8fu7LOkZVqd7J1ya5Fh8grYxlqtWdIJqZidTwGV5KVdRF_yxhdDBtII9izQjfr_Uis0OoA6hONw-t57oY3rNVVsYb9bCYunIsJk8yj9ibQgxbvkWTeSICXwDhZmlY_aPKqb77r-jlrX7p91HHoZGHCtkiCwBSNwFOJ8V_aDE3xrq6HVYWz7jkTM_HEzFDNTmXLE8YFaBxxmmlbONRZffibC1bj"/>
+<div>
+<h3 class="font-bold text-white text-lg">Pikachu Illustrator</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 1</p>
+<p class="text-sm text-green-400 font-semibold">$5,000,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Jace, the Mind Sculptor card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeqVqiuHoaKplmFEBcGn_6x4VxeT-9KKUqh7H3LwEAhD_RJfP8vvG2cNqdFEcJGq_-rutP9yZRev3uFH-9roYcXed3mCSa8Jf-1Z3PgZOXrDSd7eYtDk3jVL2bj2s9mBHes9jUi0ZoZpIHB9O6JTDa-H4ykmuMq9G4qW77iZdC9Jh3DNweAURAWelFesmmefSI2HGRvFVsYCw-0i5rQ10xGyjnY5oZeXeFfwcv7uzFQwnk447aIfoQuH_bZN-t_Fnou2Pvbp2exxd_"/>
+<div>
+<h3 class="font-bold text-white text-lg">Jace, the Mind Sculptor</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 4</p>
+<p class="text-sm text-[#9dabb9] font-semibold">$70</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Time Walk card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGj0AwGHrlnEPFcSF9nSxI0Crrfvi7e6Igd0Q6RsfxPIC3Y7ThXp43ms2X2osTfA5qzxGyAnXzBu9yMBYqYM1jCeQrXDCl_7oqbSR86HPfdM5UZAd5nGZTGPnwbHrT6ShNR-WGLOGmImHupB23fAIv1owNV2uBRjUdP7ZbZCbOE6nMFBG-cEv-gC-Kb_CUAOB2nGBjZxmw03IgDVaDicJdL9qiJEZxPr1WO6_X4z3IJ2KDQBLbdxP3yg_M7UaUgDmzIGlwQIH8ZAJt"/>
+<div>
+<h3 class="font-bold text-white text-lg">Time Walk</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 1</p>
+<p class="text-sm text-green-400 font-semibold">$5,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Blue-Eyes White Dragon card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9aunr7JQlbuSBftEhTaqXsN11vvvlw7M6atCE_fyPxuUbvvDJLwFY8MkaBwdeKCJVvAqNStDi33mtJnJPbeb8eMKgF8qjifErkn8Qkzez0YDQTCBU8RQJADYIW9G5D8ndHi8lFrxa3fd_na-BTazlGQbZaSjm7aRbB7ova1LQPr9g-50ZQB8M8Sh0pxisnhNrclgEDdrw_8LxhHSmkY9jlgvpAcwdHwmd736reRJcpcUmPdG9wn4huxNttrsN9dsJwxXC_5GGfEPo"/>
+<div>
+<h3 class="font-bold text-white text-lg">Blue-Eyes White Dragon</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 3</p>
+<p class="text-sm text-green-400 font-semibold">$2,500</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Mox Pearl card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcNdC_2TxPXVmuvS-D7nmWEgNk04o1I_MYTj0Six3hn58CTpkxHLhJdV2RGxly14HJvGGlfD14Wu4rkWr3gC7ppHGxAZYosb-6adCDgS-Y7ClvQtg9mpqn4cN1g172FGznAfN_QeYXbsKh0KcaP8fVviuusap6iFfzaeam_yKKsM60z-y92ClIZEqb5w3wG7WkoBeAF9WbzOZreGsEEggtYmAp9iY6YANQWdZnPey64zsnKEhAsqSdrXAUMFSUwccvSv9CaiFMoyws"/>
+<div>
+<h3 class="font-bold text-white text-lg">Mox Pearl</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 1</p>
+<p class="text-sm text-green-400 font-semibold">$4,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Dark Magician card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB47kvjQnpiweRcgQyPiz6rRN7R2-BHW4LbwHo98b4tbm2xZ8oW493PpeiQLL3aZBs7YOL3z0GqA0jlqJliqvRSjwIBOauWUq58QtrZDJC2UzEjxHWSoGCt68uDz4VCOxb-VVLLb1x344nEvK_2b4zQx6j27RBYlzmGXsiyQaLLREx4MlZn-2QwNRAqDWnzGdGZw1vNHbtMhUt-K2ImXBkrRtNMH11zR2SsGb1gzu528NWHYMmiRs-FZjxFY2f45Dz1Num7PyrnFl5A"/>
+<div>
+<h3 class="font-bold text-white text-lg">Dark Magician</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 5</p>
+<p class="text-sm text-[#9dabb9] font-semibold">$100</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Mox Sapphire card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL6nt6zbTPKgV2MoNE-tn5UFyXeHoQRPYqTGjFRo_XhuAnKVQByMpw952JaUndFJMWnt_ugRC0qUwqXAatoaElXdgkpvMYMvOudn5Ktfq5vBOH19eh8Tjqm86aj97klz4bZgJeo5BGPfg8XfLAfu0r7uS8dxztFTJEHoLvGpqSCmxkT-_sP5MTa_QzBQTAKX4c3zbVW8y0hi-kvaye7AQQPaBLYh_fycY0H2IzwBMDGiAk5LoVIApQkKyS2fWR0Gh-ooXwnm6ip4yC"/>
+<div>
+<h3 class="font-bold text-white text-lg">Mox Sapphire</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 1</p>
+<p class="text-sm text-green-400 font-semibold">$6,000</p>
+</div>
+</div>
+</div>
+<div class="bg-[#1c2127] rounded-lg p-4 flex flex-col gap-4 cursor-pointer border-2 border-transparent hover:border-primary">
+<img alt="Force of Will card" class="w-full h-auto rounded-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcLhKqLRLk-LbKVPYg9egPO0GobIRTrNdOzbphr1VXhPjMPmg2gyep9cOT-FpzCkJ-Gf9aN8get5opoV8YAwN7kviQZZy6IwvG73F5K5rEPr9awS7qkmQtw4gdFAvkafMTwa3bndukIzzuamnMeNuAvJygU8B2FRGDaHgWJ3thW4IjAJy3bFmocTN_McsoLMwykj0dcgOvqktkeZpiNLQ9i3ndd8Az4ntoNX50d2016soTtO3J9wr6vcjxij0-rfhoSb9efutcutUT"/>
+<div>
+<h3 class="font-bold text-white text-lg">Force of Will</h3>
+<div class="flex justify-between items-center mt-2">
+<p class="text-sm text-[#9dabb9]">Qty: 8</p>
+<p class="text-sm text-[#9dabb9] font-semibold">$90</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center p-4">
+<a class="flex size-10 items-center justify-center text-white" href="#">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</a>
+<a class="text-sm font-bold leading-normal flex size-10 items-center justify-center text-white rounded-full bg-primary" href="#">1</a>
+<a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-white rounded-full hover:bg-[#283039]" href="#">2</a>
+<a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-white rounded-full hover:bg-[#283039]" href="#">3</a>
+<span class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-white rounded-full">...</span>
+<a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-white rounded-full hover:bg-[#283039]" href="#">10</a>
+<a class="flex size-10 items-center justify-center text-white" href="#">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</a>
+</div>
+</div>
+<aside class="w-[380px] bg-[#111418] p-6 border-l border-[#3b4754] flex flex-col">
+<div class="flex-grow overflow-y-auto pr-2">
+<div class="flex justify-between items-start mb-6">
+<h2 class="text-2xl font-bold text-white">Black Lotus</h2>
+<button class="text-[#9dabb9] hover:text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<img alt="Black Lotus card detail" class="w-full h-auto rounded-lg mb-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNFvXzRZ5M8RIUr-kddYNu56_pLkdZj6wxM-Ld00XHhVkkF-K4pUyv4LZQu4fWjWvnKOwe2UTqSGULX1OgXirF38M4u1SqztqItSs8F5w2v56ElDWFmanRiKoBdUX_ddwijSFwDo_27cOde_63g211Rw9Hj11pVMKycxIR6FsvDjZvcYXgllVGBs6LEEFgmFWmMdDIUyIRxX-V5Pa20O-2MZtb0J27n2TJRRk32io2kCiq79uwlOoVjAOhK_ZxEMXimsD-gBtCRLuK"/>
+<div class="space-y-4">
+<div>
+<h4 class="font-semibold text-white mb-2">Card Details</h4>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+<p class="text-[#9dabb9]">Set:</p><p class="text-white">Alpha</p>
+<p class="text-[#9dabb9]">Rarity:</p><p class="text-white">Rare</p>
+<p class="text-[#9dabb9]">Type:</p><p class="text-white">Artifact</p>
+<p class="text-[#9dabb9]">Mana Cost:</p><p class="text-white">0</p>
+</div>
+</div>
+<div>
+<h4 class="font-semibold text-white mb-2">Inventory Information</h4>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+<p class="text-[#9dabb9]">Quantity:</p><p class="text-white">1</p>
+<p class="text-[#9dabb9]">Location:</p><p class="text-white">A-01</p>
+<p class="text-[#9dabb9]">Condition:</p><p class="text-white">Near Mint</p>
+</div>
+</div>
+<div>
+<h4 class="font-semibold text-white mb-2">Value</h4>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+<p class="text-[#9dabb9]">Market Price:</p><p class="text-green-400 font-bold">$100,000</p>
+<p class="text-[#9dabb9]">Acquired Price:</p><p class="text-white">$50</p>
+</div>
+</div>
+<div>
+<h4 class="font-semibold text-white mb-2">Notes</h4>
+<p class="text-[#9dabb9] text-sm">Graded BGS 9.5. Purchased from a collector in 2010.</p>
+</div>
+</div>
+</div>
+<div class="mt-8 flex flex-col gap-2 pt-4 border-t border-[#3b4754]">
+<button class="w-full h-10 px-4 bg-primary text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">edit</span>
+<span>Edit Card</span>
+</button>
+<button class="w-full h-10 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">delete</span>
+<span>Delete Card</span>
+</button>
+</div>
+</aside>
+</main>
+</div>
+
+</body></html>

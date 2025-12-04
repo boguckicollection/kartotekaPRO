@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TCG Trading Card Store CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1173d4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex min-h-screen">
+<aside class="flex flex-col w-64 bg-[#1e2a3a]">
+<div class="flex items-center justify-center h-16 border-b border-b-[#2c3e50]">
+<h1 class="text-white text-xl font-bold font-display">TCG Center</h1>
+</div>
+<div class="flex flex-col flex-1 p-4">
+<div class="flex items-center gap-4 mb-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12" data-alt="User avatar with abstract pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZVV5LZptqSF6fZMsF0ZcNbYc-TFzE_x5qT4q0dwC235WdkrjV8EHgh5Hk4HacBzi2S5jHzIi6wya1Y5tIt1n0TXeCN1YIiIloJhzjryX6o6EREImE_i4o9fb7hh-DPjX_y3JpiYmzSJVKylrIx9ewIeuDEFzkIKsa2PuNTU8GriSv1_CewnR20B37tSNHQIwctdrg93i8u8IgLbsd-Ymzhog2c3n5SXnEr_9kKhvFd3HtnsaJauqu25kv-4cKOsmy5nsutLL5fj-K");'></div>
+<div>
+<p class="text-white font-medium font-display">Admin</p>
+<p class="text-gray-400 text-sm font-display">admin@tcg.com</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+<span class="font-display">Card Scan Analysis</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-display">Warehouse View</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white bg-primary rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+<span class="font-display">Statistics Preview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">sell</span>
+<span class="font-display">Card Valuation</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-display">Bidding</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-display">Order Control</span>
+</a>
+</nav>
+</div>
+<div class="p-4 border-t border-t-[#2c3e50]">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-primary/20 hover:text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-display">Settings</span>
+</a>
+<button class="w-full mt-4 flex items-center justify-center gap-3 px-3 py-2 text-gray-300 bg-red-600/80 hover:bg-red-600 rounded-lg">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-display">Logout</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<header class="mb-8">
+<h1 class="text-white tracking-light text-[32px] font-bold leading-tight font-display">Dashboard</h1>
+<p class="text-gray-400 font-display">Welcome back, here's an overview of your store.</p>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-[#2c3e50] transform hover:-translate-y-1 transition-transform duration-300">
+<p class="text-gray-300 text-base font-medium leading-normal font-display">Total Cards in Store</p>
+<p class="text-white tracking-light text-3xl font-bold leading-tight font-display">12,456</p>
+<p class="text-green-500 text-base font-medium leading-normal font-display flex items-center">
+<span class="material-symbols-outlined text-lg">arrow_upward</span>
+                            +5%
+                        </p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-[#2c3e50] transform hover:-translate-y-1 transition-transform duration-300">
+<p class="text-gray-300 text-base font-medium leading-normal font-display">Total Value of Cards</p>
+<p class="text-white tracking-light text-3xl font-bold leading-tight font-display">$1,234,567</p>
+<p class="text-green-500 text-base font-medium leading-normal font-display flex items-center">
+<span class="material-symbols-outlined text-lg">arrow_upward</span>
+                             +2.3%
+                        </p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-[#2c3e50] transform hover:-translate-y-1 transition-transform duration-300">
+<p class="text-gray-300 text-base font-medium leading-normal font-display">Cards Sold (This Month)</p>
+<p class="text-white tracking-light text-3xl font-bold leading-tight font-display">890</p>
+<p class="text-green-500 text-base font-medium leading-normal font-display flex items-center">
+<span class="material-symbols-outlined text-lg">arrow_upward</span>
+                             +10%
+                        </p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-[#2c3e50] transform hover:-translate-y-1 transition-transform duration-300">
+<p class="text-gray-300 text-base font-medium leading-normal font-display">Total Sales (This Month)</p>
+<p class="text-white tracking-light text-3xl font-bold leading-tight font-display">$56,789</p>
+<p class="text-green-500 text-base font-medium leading-normal font-display flex items-center">
+<span class="material-symbols-outlined text-lg">arrow_upward</span>
+                             +15%
+                        </p>
+</div>
+</div>
+<div class="mt-8 bg-[#2c3e50] rounded-xl p-6">
+<h2 class="text-xl font-semibold text-white mb-4 font-display">Monthly Sales Trend</h2>
+<div class="h-64">
+<img class="w-full h-full object-contain" data-alt="A line chart showing monthly sales trend. The x-axis represents months and the y-axis represents sales amount. The line shows a general upward trend." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOmTT4WTaZqTv1hStTAKLqxA32ncbYFQG2uJJaubO-rI24fj0_WIeETaaVnuM8VnbZO2UuxxhWfaAV6pxxbXadqra5PkifvsqASJLEwVszTGyLkzBeX5azaEyEnsPjwD6vyjUdBziGQUCgcDDQkfTdKOL01st2IX3XTJiXhxk06qN5vPMmdPWQpvRNfnUqcq7LnfyeTDUKDYxUgssRSthyaPRKa93IU9oTH2TSuFNZysHhZpF9axkvtS0mBJDs6Nx7HyFumUOdsN3k"/>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

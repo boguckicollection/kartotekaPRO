@@ -1,0 +1,12 @@
+{
+  "name": "Card Scanner",
+  "short_name": "Scanner",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    { "src": "/biale-male.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/biale-male.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

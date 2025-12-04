@@ -1,0 +1,61 @@
+            from .local_db import LocalInventoryDB
+            from .stats_service import get_cached_or_compute
+            client = getattr(self, "shoper_client", None)
+            if client is None:
+                inv = getattr(self, "inventory_service", None) or WarehouseInventoryService.create_default()
+                client = getattr(inv, "_client", None)
+            stats = get_cached_or_compute(client, LocalInventoryDB()) if client else None
+        except Exception:
+            stats = None
+        if stats:
+            unsold_count = stats.get("unsold_count", 0)
+            unsold_total = float(stats.get("unsold_total", 0.0))
+            sold_count = stats.get("sold_count", 0)
+            sold_total = float(stats.get("sold_total", 0.0))
+        else:
+            unsold_count, unsold_total, sold_count, sold_total = csv_utils.get_inventory_stats()
+        if unsold_count == 0 and sold_count == 0:
+            messagebox.showinfo("Magazyn", "Brak kart w magazynie")
+        # Module buttons stacked vertically in the menu
+        scan_btn = self.create_button(
+            menu_frame,
+            text="\U0001f50d Skanuj",
+            command=self.show_location_frame,
+            fg_color=SCAN_BUTTON_COLOR,
+            width=100,
+        )
+        scan_btn.pack(padx=10, pady=5, fill="x")
+        self.create_button(
+            menu_frame,
+            text="\U0001f4b0 Wyceniaj",
+            command=self.setup_pricing_ui,
+            fg_color=PRICE_BUTTON_COLOR,
+            width=100,
+        ).pack(padx=10, pady=5, fill="x")
+        self.create_button(
+            menu_frame,
+            text="\U0001f5c3\ufe0f Shoper",
+            command=self.open_shoper_window,
+            fg_color=SHOPER_BUTTON_COLOR,
+            width=100,
+        ).pack(padx=10, pady=5, fill="x")
+        self.create_button(
+            menu_frame,
+            text="\U0001f4e6 Magazyn",
+            command=self.show_magazyn_view,
+            fg_color=MAGAZYN_BUTTON_COLOR,
+            width=100,
+        ).pack(padx=10, pady=5, fill="x")
+        self.create_button(
+            menu_frame,
+            text="\U0001f528 Licytacje",
+            command=self.open_auctions_window,
+            fg_color=AUCTION_BUTTON_COLOR,
+            width=100,
+        ).pack(padx=10, pady=5, fill="x")
+
+        self.create_button(
+            menu_frame,
+            text="\U0001F4C8 Statystyki",
+            command=getattr(self, "open_statistics_window", lambda: None),
+            fg_color=STATS_BUTTON_COLOR,

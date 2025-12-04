@@ -1,0 +1,61 @@
+            fg_color=STATS_BUTTON_COLOR,
+            width=100,
+        ).pack(padx=10, pady=5, fill="x")
+
+        ctk.CTkLabel(
+            main_frame,
+            text="Podgląd kartonów",
+            text_color=TEXT_COLOR,
+            font=("Segoe UI", 24, "bold"),
+        ).pack(pady=(20, 0))
+
+        box_frame = ctk.CTkFrame(main_frame, fg_color=LIGHT_BG_COLOR)
+        box_frame.pack(anchor="center", padx=10, pady=10)
+
+        CardEditorApp.build_home_box_preview(self, box_frame)
+        # Refresh the initial box preview if possible.  The welcome screen does
+        # not depend on the full warehouse window, therefore it prefers a
+        # lightweight ``refresh_home_preview`` method but falls back to the
+        # legacy ``refresh_magazyn`` if needed.
+        if hasattr(self, "refresh_home_preview"):
+            try:
+                self.refresh_home_preview()
+            except Exception:  # pragma: no cover - defensive logging
+                logger.exception("Failed to refresh magazyn preview")
+        elif hasattr(self, "refresh_magazyn"):
+            try:
+                self.refresh_magazyn()
+            except Exception:  # pragma: no cover - defensive logging
+                logger.exception("Failed to refresh magazyn preview")
+
+        ctk.CTkLabel(
+            main_frame,
+            text="Statystyki",
+            text_color=TEXT_COLOR,
+            font=("Segoe UI", 24, "bold"),
+        ).pack(pady=(20, 0))
+
+        info_frame = ctk.CTkFrame(main_frame, fg_color=LIGHT_BG_COLOR)
+        info_frame.pack(anchor="center", padx=10, pady=(0, 40))
+
+        self.inventory_count_label = ctk.CTkLabel(
+            info_frame,
+            text=f"📊 Łączna liczba kart: {unsold_count}",
+            text_color=TEXT_COLOR,
+            font=("Segoe UI", 24, "bold"),
+            justify="left",
+        )
+        self.inventory_count_label.pack(anchor="center")
+
+        self.inventory_value_label = ctk.CTkLabel(
+            info_frame,
+            text=f"💰 Łączna wartość: {unsold_total:.2f} PLN",
+            text_color="#FFD700",
+            font=("Segoe UI", 24, "bold"),
+            justify="left",
+        )
+        self.inventory_value_label.pack(anchor="center")
+
+        self.inventory_sold_count_label = ctk.CTkLabel(
+            info_frame,
+            text=f"Sprzedane karty: {sold_count}",
