@@ -1,0 +1,65 @@
+[
+    {
+        "name": "BoosterPoint",
+        "domain": "boosterpoint.pl",
+        "search_url": "https://boosterpoint.pl/wszystkie-produkty/?s={query}&post_type=product&ct_product_price=1",
+        "item_selector": ".product",
+        "title_selector": ".woocommerce-loop-product__title",
+        "link_selector": ".woocommerce-loop-product__link",
+        "price_selector": ".price ins .amount bdi, .price .amount bdi",
+        "price_type": "text",
+        "stock_check_class": "outofstock"
+    },
+    {
+        "name": "LootQuest",
+        "domain": "lootquest.pl",
+        "search_url": "https://lootquest.pl/?s={query}&post_type=product&dgwt_wcas=1",
+        "item_selector": ".product",
+        "title_selector": ".woocommerce-loop-product__title",
+        "link_selector": ".woocommerce-loop-product__link",
+        "price_selector": ".price ins .amount bdi, .price .amount bdi",
+        "price_type": "text",
+        "stock_check_class": "outofstock"
+    },
+    {
+        "name": "JuniorKurczak",
+        "domain": "juniorkurczak.pl",
+        "search_url": "https://juniorkurczak.pl/products/search?keyword={query}",
+        "item_selector": ".grid-product__wrap-inner",
+        "title_selector": ".grid-product__title-inner",
+        "link_selector": "a.grid-product__link",
+        "price_selector": ".details-product-price__value",
+        "price_type": "text"
+    },
+    {
+        "name": "PokeShop",
+        "domain": "pokeshop.pl",
+        "search_url": "https://pokeshop.pl/szukaj.html/szukaj={query}",
+        "item_selector": ".Okno",
+        "title_selector": ".ProdCena h3 a",
+        "link_selector": ".ProdCena h3 a",
+        "price_selector": ".CenaAktualna",
+        "price_type": "text"
+    },
+    {
+        "name": "TCG Love",
+        "domain": "tcglove.pl",
+        "search_url": "https://www.tcglove.pl/pl/searchquery/{query}/1/full/5?url={query_commas}",
+        "item_selector": "product-tile",
+        "title_selector": ".product-tile__name",
+        "link_selector": "a",
+        "price_selector": ".price__value",
+        "price_type": "text"
+    },
+    {
+        "name": "PokeKarty",
+        "domain": "pokekarty.pl",
+        "search_url": "https://pokekarty.pl/?s={query}&post_type=product",
+        "item_selector": "div.product-wrapper",
+        "title_selector": "h3.wd-entities-title a",
+        "link_selector": "h3.wd-entities-title a",
+        "price_selector": ".price ins .amount bdi, .price .amount bdi",
+        "price_type": "text",
+        "stock_check_class": "outofstock"
+    }
+]

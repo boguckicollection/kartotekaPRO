@@ -13,9 +13,22 @@ from ..services import tcg_api
 from .. import models, schemas
 from ..auth import get_current_user
 from ..utils import text
+from ..price_comparison import search_polish_prices
 from sqlmodel import Session, select
+import asyncio
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
+@router.get("/prices/compare-pl")
+async def compare_prices_api(query: str):
+    """API endpoint to search Polish shops."""
+    if not query or len(query) < 3:
+        return []
+    
+    loop = asyncio.get_event_loop()
+    results = await loop.run_in_executor(None, search_polish_prices, query)
+    return results
 
 
 def _apply_product_price(product: models.Product, session: Session) -> bool:

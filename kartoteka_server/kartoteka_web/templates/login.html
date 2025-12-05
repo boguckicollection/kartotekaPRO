@@ -3,67 +3,51 @@
 
 {% block head_extra %}
 <style>
-/* Zinc Auth Styles */
-.auth-section {
+/* Gradient Background matching App Theme */
+.auth-page {
   min-height: calc(100vh - 56px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #09090b;
+  background: radial-gradient(circle at top center, #18181b 0%, #09090b 100%);
   padding: 24px;
 }
 
-.auth-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+.auth-card {
   background: #18181b;
   border: 1px solid #27272a;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  max-width: 900px;
+  max-width: 400px;
   width: 100%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-@media (min-width: 768px) {
-  .auth-container {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.auth-info {
-  background: #000000;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-right: 1px solid #27272a;
-}
-
-.auth-form-wrapper {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, #6366f1, transparent);
+    opacity: 0.5;
 }
 
 .zinc-input {
   background: #09090b;
   border: 1px solid #27272a;
   color: #fafafa;
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 13px;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
   width: 100%;
-  margin-top: 4px;
   transition: all 0.2s;
+  outline: none;
 }
 
 .zinc-input:focus {
   border-color: #6366f1;
-  outline: none;
   box-shadow: 0 0 0 1px #6366f1;
+  background: #000;
 }
 
 .zinc-label {
@@ -71,115 +55,71 @@
   font-size: 12px;
   font-weight: 500;
   color: #a1a1aa;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .zinc-btn {
   width: 100%;
-  background: #4f46e5;
+  background: linear-gradient(to right, #4f46e5, #4338ca);
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 8px;
+  transition: opacity 0.2s;
+  margin-top: 12px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .zinc-btn:hover {
-  background: #4338ca;
-}
-
-.feature-list {
-  margin-top: 24px;
-  list-style: none;
-  padding: 0;
-  space-y: 16px;
-}
-
-.feature-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.feature-icon {
-  width: 24px;
-  height: 24px;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 6px;
-  color: #6366f1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.feature-text {
-  font-size: 13px;
-  color: #a1a1aa;
-  line-height: 1.4;
+  opacity: 0.9;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="auth-section">
-  <div class="auth-container">
-    <!-- Left: Info -->
-    <div class="auth-info">
-      <div class="inline-flex items-center px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-medium text-indigo-400 uppercase tracking-wider mb-4 w-fit">
-        Pokemon TCG Manager
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="p-8">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 mb-4 border border-indigo-500/20">
+          <i data-lucide="log-in" class="w-6 h-6"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-2">Witaj ponownie</h1>
+        <p class="text-sm text-zinc-400">Zaloguj się do swojego konta</p>
       </div>
-      <h1 class="text-2xl font-bold text-white mb-4">Powrót do kolekcji</h1>
-      <p class="text-sm text-zinc-400 leading-relaxed">
-        Zaloguj się, aby śledzić swoją kolekcję Pokemon TCG, odświeżać wyceny kart i zarządzać zakupami z dowolnego urządzenia.
-      </p>
-      
-      <div class="mt-8">
-        <div class="feature-item">
-          <div class="feature-icon">01</div>
-          <div class="feature-text">Natychmiastowy wgląd w liczbę kart oraz ich szacowaną wartość.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">02</div>
-          <div class="feature-text">Aktualizacje cen jednym kliknięciem dzięki wbudowanemu modułowi wyceny.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">03</div>
-          <div class="feature-text">Synchronizacja danych między aplikacją webową i mobilną.</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Right: Form -->
-    <div class="auth-form-wrapper">
-      <h2 class="text-lg font-semibold text-white mb-1">Panel logowania</h2>
-      <p class="text-xs text-zinc-500 mb-6">Wpisz dane swojego konta, aby przejść do kokpitu.</p>
+      <div class="alert bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2" id="login-alert" hidden>
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span></span>
+      </div>
       
-      <div class="alert bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-2 rounded text-xs mb-4" id="login-alert" hidden></div>
-      
-      <form id="login-form" method="POST">
-        <label class="zinc-label">
-          Nazwa użytkownika
-          <input type="text" name="username" autocomplete="username" required class="zinc-input" />
-        </label>
+      <form id="login-form" method="POST" class="space-y-5">
+        <div>
+            <label class="zinc-label">Nazwa użytkownika</label>
+            <input type="text" name="username" autocomplete="username" required class="zinc-input" placeholder="Wpisz login" />
+        </div>
         
-        <label class="zinc-label">
-          Hasło
-          <input type="password" name="password" autocomplete="current-password" required class="zinc-input" />
-        </label>
+        <div>
+            <div class="flex justify-between items-center mb-1.5">
+                <label class="zinc-label !mb-0">Hasło</label>
+                <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Zapomniałeś hasła?</a>
+            </div>
+            <input type="password" name="password" autocomplete="current-password" required class="zinc-input" placeholder="••••••••" />
+        </div>
         
         <button type="submit" class="zinc-btn">Zaloguj się</button>
-        
-        <p class="text-xs text-center mt-4 text-zinc-500">
-          Nie masz konta? <a href="/register" class="text-indigo-400 hover:text-indigo-300 font-medium">Zarejestruj się</a>
-        </p>
       </form>
+      
+      <div class="mt-6 text-center pt-6 border-t border-zinc-800">
+          <p class="text-sm text-zinc-500">
+            Nie masz jeszcze konta? <a href="/register" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Zarejestruj się</a>
+          </p>
+      </div>
     </div>
   </div>
 </section>
@@ -189,45 +129,36 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
     const alertBox = document.getElementById('login-alert');
+    const msgSpan = alertBox.querySelector('span');
     const submitBtn = form.querySelector('button[type="submit"]');
     
-    // Reset alert
     alertBox.hidden = true;
-    alertBox.textContent = '';
     submitBtn.disabled = true;
     const originalBtnText = submitBtn.textContent;
-    submitBtn.textContent = 'Logowanie...';
+    submitBtn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Logowanie...';
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
     try {
-        // Prepare URL encoded form data for OAuth2 spec compliance if needed, 
-        // but our backend uses Pydantic schema (JSON) for login endpoint based on previous read.
-        // Let's verify routes/users.py: login takes schemas.UserLogin (JSON).
-        
         const response = await fetch('/users/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
         if (response.ok) {
             const resData = await response.json();
-            // Store token for Client-side API calls (Scanner/React)
             localStorage.setItem('kartoteka_token', resData.access_token);
             
-            // Note: HttpOnly cookie is set by the server for SSR authentication.
-
+            // Show success styling
+            alertBox.classList.remove('bg-red-500/10', 'border-red-500/20', 'text-red-400');
+            alertBox.classList.add('bg-green-500/10', 'border-green-500/20', 'text-green-400');
+            msgSpan.textContent = "Zalogowano pomyślnie! Przekierowanie...";
             alertBox.hidden = false;
-            alertBox.className = "alert bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-2 rounded text-xs mb-4";
-            alertBox.textContent = "Zalogowano pomyślnie!";
             
             setTimeout(() => {
-                // Redirect to dashboard or home
-                window.location.href = '/dashboard';
+                window.location.href = '/collection'; // Redirect to collection usually better than dashboard for user
             }, 500);
         } else {
             let errMsg = 'Błąd logowania';
@@ -238,9 +169,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             throw new Error(errMsg);
         }
     } catch (error) {
+        alertBox.classList.add('bg-red-500/10', 'border-red-500/20', 'text-red-400');
+        alertBox.classList.remove('bg-green-500/10', 'border-green-500/20', 'text-green-400');
+        msgSpan.textContent = error.message;
         alertBox.hidden = false;
-        alertBox.className = "alert bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-2 rounded text-xs mb-4";
-        alertBox.textContent = error.message;
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
     }

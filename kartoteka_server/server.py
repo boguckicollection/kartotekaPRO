@@ -591,6 +591,19 @@ async def cookies_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("cookies.html", context)
 
 
+@app.get("/price-check", response_class=HTMLResponse)
+async def price_check_page(request: Request) -> HTMLResponse:
+    """Page for checking prices in Polish shops."""
+    username, invalid_credentials, avatar_url, is_admin = await _resolve_request_user(request)
+    context = {
+        "request": request,
+        "username": username if not invalid_credentials else "",
+        "avatar_url": avatar_url if not invalid_credentials else "",
+        "is_admin": is_admin if not invalid_credentials else False,
+    }
+    return templates.TemplateResponse("price_check.html", context)
+
+
 def _uvicorn_config() -> tuple[str, int, bool]:
     """Return host, port and reload flag for running the server."""
 
