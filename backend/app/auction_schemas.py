@@ -89,6 +89,11 @@ class AuctionDetail(AuctionRead):
     messages: List[MessageRead] = []
     product_name: Optional[str] = None
     card_name: Optional[str] = None
+    # Card details for info popup
+    card_set: Optional[str] = None
+    card_number: Optional[str] = None
+    card_price_market: Optional[float] = None
+    card_price_psa: Optional[float] = None
 
 
 class AuctionList(BaseModel):

@@ -25,7 +25,7 @@
     @media (min-width: 1024px) {
         .auction-layout {
             display: grid;
-            grid-template-columns: 350px 1fr 350px;
+            grid-template-columns: 450px 1fr 450px;
             gap: 24px;
             height: calc(100vh - 120px);
         }
@@ -72,6 +72,37 @@
     .bg-radial-gradient {
         background: radial-gradient(circle at center, #27272a 0%, #09090b 80%, #000000 100%);
     }
+    
+    .glass-panel {
+        background: rgba(24, 24, 27, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .info-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 50;
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .info-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+    
+    #bids-list {
+        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        padding-bottom: 40px;
+    }
 </style>
 {% endblock %}
 
@@ -82,7 +113,7 @@
 <!-- ========================================== -->
 <!-- MOBILE LAYOUT (Standard Flow, Scrollable)  -->
 <!-- ========================================== -->
-<div class="lg:hidden flex flex-col min-h-screen bg-black text-zinc-200" id="mobile-view-container" style="display:none">
+<div class="lg:hidden flex flex-col min-h-screen bg-black text-zinc-200" id="mobile-view-container">
     
     <!-- 1. Sticky Header -->
     <div class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex justify-between items-center shadow-lg">
@@ -98,29 +129,31 @@
     </div>
 
     <!-- 2. Main Card Area -->
-    <div class="py-8 px-6 flex justify-center bg-radial-gradient">
+    <div class="py-8 px-6 flex justify-center bg-radial-gradient relative">
         <img id="auction-image-mobile" class="w-full max-w-[300px] h-auto object-contain drop-shadow-2xl rounded-lg" src="/static/img/box.png" onerror="this.src='https://placehold.co/400x600/18181b/27272a?text=No+Image'">
     </div>
 
     <!-- 3. Action Bar -->
     <div class="p-4 bg-zinc-900 border-t border-zinc-800 sticky bottom-0 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
-        <button id="mobile-bid-btn" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-lg rounded-xl shadow-lg shadow-indigo-900/40 active:scale-95 transition-transform flex items-center justify-center gap-2 border border-white/10">
-            <i data-lucide="gavel" class="w-5 h-5"></i>
-            PODBIJ <span id="mobile-increment-hint" class="bg-black/20 px-2 py-0.5 rounded text-sm font-normal">+5</span>
-        </button>
+        <div class="flex gap-2">
+            <div class="relative flex-1">
+                <input type="number" id="mobile-custom-bid" placeholder="Kwota..." class="w-full h-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 text-white text-lg font-mono outline-none focus:border-indigo-500 transition-colors placeholder:text-zinc-700">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500 pointer-events-none">PLN</div>
+            </div>
+            <button id="mobile-bid-btn" class="flex-1 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-lg rounded-xl shadow-lg shadow-indigo-900/40 active:scale-95 transition-transform flex items-center justify-center gap-2 border border-white/10">
+                <i data-lucide="gavel" class="w-5 h-5"></i>
+                PODBIJ
+            </button>
+        </div>
+        <div class="text-center mt-2">
+            <span id="mobile-increment-hint" class="text-xs text-zinc-500">Min. podbicie: +5</span>
+        </div>
     </div>
 
     <!-- 4. Bids History -->
     <div class="p-4 space-y-4 bg-black pb-12">
         <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-800 pb-2 mb-3">Ostatnie oferty</h3>
         <div id="mobile-bids-list" class="space-y-3"></div>
-        <div class="pt-6">
-            <button onclick="alert('Chat mobilny wkrótce')" class="w-full py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 text-sm font-medium flex items-center justify-center gap-2">
-                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                Otwórz czat (Wkrótce)
-            </button>
-        </div>
-        <div class="h-20"></div>
     </div>
 </div>
 
@@ -128,17 +161,19 @@
 <!-- DESKTOP LAYOUT (Grid, Fixed, 3D)           -->
 <!-- ========================================== -->
 <div class="hidden lg:flex flex-col container mx-auto px-4 py-4 h-full max-w-[1800px]">
-  <header class="mb-4 flex items-center justify-between gap-4">
-    <div class="flex items-center gap-4">
+  <header class="mb-4 grid grid-cols-3 items-center">
+    <div class="flex items-center gap-4 justify-start">
         <a href="/auctions" class="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
           <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </a>
-        <div>
-            <h1 class="text-xl font-bold text-white tracking-tight leading-none" id="auction-title">Ładowanie...</h1>
-            <p class="text-xs text-zinc-500 mt-1" id="auction-subtitle"></p>
-        </div>
     </div>
-    <div class="flex items-center gap-4">
+    
+    <div class="text-center">
+        <h1 class="text-2xl font-bold text-white tracking-tight leading-none" id="auction-title">Ładowanie...</h1>
+        <p class="text-sm text-zinc-500 mt-1" id="auction-subtitle"></p>
+    </div>
+
+    <div class="flex items-center gap-4 justify-end">
         <button id="sound-toggle" class="p-2 rounded-lg text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
         <div class="bg-zinc-900 border border-zinc-800 px-6 py-2 rounded-xl flex flex-col items-center min-w-[140px]">
             <span class="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Koniec za</span>
@@ -147,7 +182,7 @@
     </div>
   </header>
 
-  <div id="auction-content" class="auction-layout hidden">
+  <div id="auction-content" class="auction-layout hidden lg:grid">
     <!-- LEFT: Bids -->
     <div class="panel shadow-xl">
         <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-950/50 backdrop-blur-sm">
@@ -158,7 +193,12 @@
     </div>
 
     <!-- CENTER: Card -->
-    <div class="flex flex-col gap-6 items-center justify-center h-full relative">
+    <div class="flex flex-col gap-6 items-center justify-center h-full relative group">
+        <!-- Info Button moved outside wrapper -->
+        <button class="info-btn opacity-0 group-hover:opacity-100 transition-opacity duration-300" onclick="document.getElementById('card-info-modal').classList.remove('hidden')" title="Szczegóły karty">
+            <i data-lucide="info" class="w-5 h-5"></i>
+        </button>
+        
         <div id="desktop-card-wrapper" class="zinc-card-wrapper w-full">
           <div class="card interactive w-full h-full" id="pokemon-card-desktop">
             <div class="card__translater">
@@ -172,15 +212,29 @@
             </div>
           </div>
         </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="w-full max-w-md space-y-4 text-center z-10">
             <div class="flex flex-col items-center bg-zinc-900/80 backdrop-blur-md border border-zinc-800 p-4 rounded-2xl shadow-2xl" id="price-container">
                 <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Aktualna cena</p>
                 <div class="text-5xl font-bold text-emerald-400 font-mono tracking-tighter" id="current-price">0.00 <span class="text-xl text-emerald-600">PLN</span></div>
             </div>
-            <button id="place-bid-btn" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-lg rounded-xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 border border-white/10 hover:shadow-indigo-500/40">
-                <i data-lucide="gavel" class="w-6 h-6"></i>
-                Podbij <span id="min-increment-hint" class="text-sm font-normal opacity-80 bg-black/20 px-2 py-0.5 rounded ml-2">+5</span>
-            </button>
+            
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <input type="number" id="custom-bid-input" placeholder="Kwota..." class="w-full h-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 text-white text-lg font-mono outline-none focus:border-indigo-500 transition-colors placeholder:text-zinc-700 hover:border-zinc-700">
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500 pointer-events-none">PLN</div>
+                </div>
+                <button id="place-bid-btn" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-lg rounded-xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 border border-white/10 hover:shadow-indigo-500/40">
+                    <i data-lucide="gavel" class="w-5 h-5"></i>
+                    Podbij
+                </button>
+            </div>
+            <div class="text-xs text-zinc-500 font-mono">
+                Minimalne podbicie: <span id="min-increment-hint" class="text-zinc-400">+5 PLN</span>
+            </div>
         </div>
     </div>
 
@@ -202,7 +256,6 @@
 </div>
 
 <!-- Modals -->
-<div id="bid-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"><div id="bid-modal-content" class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6"><h2 class="text-white text-lg font-bold mb-4">Licytuj</h2><form id="bid-form" class="space-y-4"><input type="number" id="bid-amount" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white" required><button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl">Złóż Ofertę</button></form><div id="bid-msg" class="mt-4 text-center text-sm"></div><button class="close-button mt-4 w-full text-zinc-500">Anuluj</button></div></div>
 <div id="login-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"><div id="login-modal-content" class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6"><h2 class="text-white text-lg font-bold mb-4">Zaloguj</h2><form id="login-form" class="space-y-4"><input type="text" id="login-username" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white" placeholder="Login"><input type="password" id="login-password" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white" placeholder="Hasło"><button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl">Zaloguj</button></form><div id="login-msg" class="mt-4 text-center text-sm"></div><button class="close-button mt-4 w-full text-zinc-500">Anuluj</button></div></div>
 <div id="winner-modal" class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4"><div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-sm p-8 text-center"><h2 class="text-2xl font-bold text-white mb-4">Koniec!</h2><p class="text-zinc-400 mb-6">Wygrał: <span id="winner-name" class="text-white font-bold"></span> za <span id="winner-price" class="text-emerald-400 font-bold"></span></p><div id="participation-msg" class="hidden text-xs text-indigo-400 mb-6">Brałeś udział.</div><a href="/auctions" class="block w-full py-3 bg-zinc-100 text-zinc-900 font-bold rounded-xl">Wróć</a></div></div>
 
@@ -223,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeBtn = document.getElementById('place-bid-btn');
     const mobBtn = document.getElementById('mobile-bid-btn');
     const loginForm = document.getElementById('login-form');
-    const bidForm = document.getElementById('bid-form');
     const soundToggle = document.getElementById('sound-toggle');
 
     if(soundToggle) {
@@ -233,8 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if(placeBtn) placeBtn.onclick = () => openBid(AUCTION_ID, currentAuctionData.current_price, currentAuctionData.min_increment);
-    if(mobBtn) mobBtn.onclick = () => openBid(AUCTION_ID, currentAuctionData.current_price, currentAuctionData.min_increment);
+    if(placeBtn) placeBtn.onclick = () => submitBid('custom-bid-input');
+    if(mobBtn) mobBtn.onclick = () => submitBid('mobile-custom-bid');
 
     async function loadAuction() {
         try {
@@ -260,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAuction(data) {
         document.getElementById('loading-spinner').classList.add('hidden');
         if(document.getElementById('auction-content')) document.getElementById('auction-content').classList.remove('hidden');
-        if(document.getElementById('mobile-view-container')) document.getElementById('mobile-view-container').style.display = 'flex';
         
         const els = {
             title: document.getElementById('auction-title'),
@@ -272,7 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
             timer: document.getElementById('main-timer'),
             mobTimer: document.getElementById('mobile-timer'),
             minInc: document.getElementById('min-increment-hint'),
-            mobMinInc: document.getElementById('mobile-increment-hint')
+            mobMinInc: document.getElementById('mobile-increment-hint'),
+            inputs: [document.getElementById('custom-bid-input'), document.getElementById('mobile-custom-bid')],
+            infoName: document.getElementById('info-name'),
+            infoNumber: document.getElementById('info-number'),
+            infoSet: document.getElementById('info-set'),
+            infoPrice: document.getElementById('info-price'),
+            infoPsa: document.getElementById('info-psa')
         };
         
         if(els.title) els.title.textContent = data.title;
@@ -286,7 +343,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if(els.mobPrice) els.mobPrice.innerHTML = `${data.current_price.toFixed(2)} PLN`;
         
         if(els.minInc) els.minInc.textContent = `+${data.min_increment} PLN`;
-        if(els.mobMinInc) els.mobMinInc.textContent = `+${data.min_increment}`;
+        if(els.mobMinInc) els.mobMinInc.textContent = `Min. podbicie: +${data.min_increment}`;
+        
+        if(els.infoName) els.infoName.textContent = data.card_name || 'Brak danych';
+        if(els.infoNumber) els.infoNumber.textContent = data.card_number || '---';
+        if(els.infoSet) els.infoSet.textContent = data.card_set || '---';
+        if(els.infoPrice) els.infoPrice.textContent = data.card_price_market ? `${data.card_price_market.toFixed(2)} EUR` : '---';
+        if(els.infoPsa) els.infoPsa.textContent = data.card_price_psa ? `${data.card_price_psa.toFixed(2)} USD` : '---';
+
+        const minNextBid = data.current_price + data.min_increment;
+        els.inputs.forEach(inp => {
+            if(inp && !inp.value) inp.placeholder = `Min: ${minNextBid.toFixed(2)}`;
+        });
         
         startTimer(data.time_remaining);
         renderBids(data.bids);
@@ -302,21 +370,50 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!bids || !bids.length) dList.innerHTML = '<div class="text-center text-zinc-500 py-4 text-sm">Brak ofert.</div>';
             else {
                 bids.forEach((bid, idx) => {
+                    // Calculate increment from previous bid (which is next in descending array, or start_price)
+                    const prevBidAmount = bids[idx+1] ? bids[idx+1].amount : (currentAuctionData.start_price || 0);
+                    const diff = bid.amount - prevBidAmount;
+                    const diffStr = diff > 0 ? `+${diff.toFixed(2)}` : '';
+                    
                     const el = document.createElement('div');
-                    el.className = `flex justify-between items-center p-3 rounded-lg border mb-2 ${idx===0 ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-zinc-900 border-zinc-800'}`;
-                    el.innerHTML = `<div class="text-white text-sm font-bold">${bid.username || 'User'}</div><div class="text-emerald-400 font-mono">${bid.amount}</div>`;
+                    el.className = `flex justify-between items-center p-4 rounded-xl border mb-2 transition-all hover:bg-zinc-900 ${idx===0 ? 'bg-emerald-900/10 border-emerald-500/20 shadow-lg shadow-emerald-900/10' : 'bg-zinc-950/50 border-zinc-800/50'}`;
+                    el.innerHTML = `
+                        <div>
+                            <div class="text-white text-base font-bold tracking-tight">${bid.username || 'User'}</div>
+                            <div class="text-zinc-500 text-[10px] font-mono">${new Date(bid.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-emerald-400 font-mono text-xl font-bold tracking-tight">${bid.amount.toFixed(2)}</div>
+                            <div class="text-emerald-600/70 text-xs font-mono font-medium">${diffStr}</div>
+                        </div>`;
                     dList.appendChild(el);
                 });
             }
         }
+        
         const mList = document.getElementById('mobile-bids-list');
         if (mList) {
             mList.innerHTML = '';
             if (bids && bids.length > 0) {
                 bids.forEach((bid, idx) => {
+                    const prevBidAmount = bids[idx+1] ? bids[idx+1].amount : (currentAuctionData.start_price || 0);
+                    const diff = bid.amount - prevBidAmount;
+                    const diffStr = diff > 0 ? `+${diff.toFixed(2)}` : '';
+
                     const el = document.createElement('div');
-                    el.className = `flex justify-between items-center p-3 rounded-xl border ${idx===0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-900 border-zinc-800'}`;
-                    el.innerHTML = `<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold">${(bid.username||'U')[0].toUpperCase()}</div><div><div class="text-white text-sm font-bold">${bid.username || 'User'}</div><div class="text-zinc-500 text-[10px]">${new Date(bid.timestamp).toLocaleTimeString()}</div></div></div><div class="text-emerald-400 font-mono font-bold">${bid.amount}</div>`;
+                    el.className = `flex justify-between items-center p-4 rounded-xl border ${idx===0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-900 border-zinc-800'}`;
+                    el.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-400 border border-zinc-700">${(bid.username||'U')[0].toUpperCase()}</div>
+                            <div>
+                                <div class="text-white text-base font-bold">${bid.username || 'User'}</div>
+                                <div class="text-zinc-500 text-xs">${new Date(bid.timestamp).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-emerald-400 font-mono font-bold text-lg">${bid.amount.toFixed(2)}</div>
+                            <div class="text-emerald-600/70 text-xs font-medium">${diffStr}</div>
+                        </div>`;
                     mList.appendChild(el);
                 });
             } else {
@@ -334,9 +431,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isMe = msg.kartoteka_user_id === USER_ID;
             const el = document.createElement('div');
             el.className = `flex flex-col mb-3 ${isMe ? 'items-end' : 'items-start'}`;
-            el.innerHTML = `<div class="max-w-[85%] rounded-xl px-3 py-2 text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-300'}">${msg.message}</div>`;
+            const usernameHtml = `<span class="text-[10px] text-zinc-500 mb-1 px-1 font-medium">${msg.username || 'Anonim'}</span>`;
+            el.innerHTML = `${usernameHtml}<div class="max-w-[85%] rounded-2xl px-4 py-2 text-sm shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-zinc-800 text-zinc-200 rounded-bl-none'}">${msg.message}</div>`;
             list.appendChild(el);
         });
+        list.scrollTop = list.scrollHeight;
     }
 
     function showWinnerModal(data) {
@@ -372,31 +471,43 @@ document.addEventListener('DOMContentLoaded', () => {
         window.auctionTimer = setInterval(update, 1000);
     }
 
-    // Modal functions
-    window.openBid = function(id, price, inc) {
+    async function submitBid(inputId) {
         if (!USER_ID || USER_ID === 'null') { openLoginModal(); return; }
-        document.getElementById('bid-modal').classList.remove('hidden');
-        document.getElementById('modal-price').textContent = price.toFixed(2) + " PLN";
-        document.getElementById('bid-amount').value = price + inc;
-        document.getElementById('modal-min-bid').textContent = (price + inc).toFixed(2);
+        if (!currentAuctionData) return;
+
+        const input = document.getElementById(inputId);
+        const userValue = input ? parseFloat(input.value) : NaN;
+        const minNextBid = currentAuctionData.current_price + currentAuctionData.min_increment;
+        
+        let amount = minNextBid;
+        
+        if (!isNaN(userValue)) {
+            if (userValue < minNextBid) {
+                alert(`Minimalna kwota to ${minNextBid.toFixed(2)} PLN`);
+                return;
+            }
+            amount = userValue;
+        }
+
+        try {
+             await fetch(`${API_BASE}/${AUCTION_ID}/bids`, { 
+                 method: 'POST', 
+                 headers: {'Content-Type': 'application/json'}, 
+                 body: JSON.stringify({ 
+                     amount: amount, 
+                     kartoteka_user_id: USER_ID, 
+                     username: USERNAME 
+                 }) 
+             });
+             if(input) input.value = '';
+             loadAuction();
+        } catch(err) { alert("Błąd: " + err); }
     }
+
     window.openLoginModal = function() { document.getElementById('login-modal').classList.remove('hidden'); }
     document.querySelectorAll('.close-button').forEach(btn => btn.onclick = () => {
-        document.getElementById('bid-modal').classList.add('hidden');
         document.getElementById('login-modal').classList.add('hidden');
     });
-
-    if(bidForm) {
-        bidForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const amount = document.getElementById('bid-amount').value;
-            try {
-                 await fetch(`${API_BASE}/${AUCTION_ID}/bids`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ amount: parseFloat(amount), kartoteka_user_id: USER_ID, username: USERNAME }) });
-                 document.getElementById('bid-modal').classList.add('hidden');
-                 loadAuction();
-            } catch(err) { alert("Błąd: " + err); }
-        };
-    }
 
     if(loginForm) {
         loginForm.onsubmit = async (e) => {
@@ -426,8 +537,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const y = e.clientY - rect.top;
                     const px = Math.min(Math.max((x / rect.width) * 100, 0), 100);
                     const py = Math.min(Math.max((y / rect.height) * 100, 0), 100);
-                    card.style.setProperty('--rotate-x', `${-(py-50)/3.5}deg`);
-                    card.style.setProperty('--rotate-y', `${(px-50)/2}deg`);
+                    
+                    // SWAPPED AXES LOGIC:
+                    // px controls rotate-x (X movement -> Tilt Up/Down)
+                    // py controls rotate-y (Y movement -> Tilt Left/Right)
+                    card.style.setProperty('--rotate-x', `${(px-50)/3.5}deg`); 
+                    card.style.setProperty('--rotate-y', `${(py-50)/2}deg`);
+                    
                     card.style.setProperty('--card-opacity', '1');
                     card.style.setProperty('--background-x', `${50+(px-50)*0.2}%`);
                     card.style.setProperty('--background-y', `${50+(py-50)*0.2}%`);

@@ -1751,7 +1751,7 @@
     }
   };
 
-  const renderSearchResults = (items, summaryEl, emptyEl, totalCount, page, perPage, viewMode) => {
+  const renderSearchResults = (items, summaryEl, emptyEl, totalCount, page, perPage, viewMode, searchType = "card") => {
     const container = document.getElementById("card-search-results");
     if (!container) return;
 
@@ -1772,21 +1772,31 @@
 
     container.innerHTML = "";
     container.className = `card-search-results card-search-results--${viewMode}`;
+    if (searchType === "product") {
+        container.classList.add("card-search-results--product");
+    }
     container.dataset.viewMode = viewMode;
     const isListView = viewMode === "list";
+    const isProduct = searchType === "product";
 
     for (const item of items) {
       const article = document.createElement("article");
       article.className = "card-search-item";
+      if (isProduct) {
+          article.classList.add("card-search-item--product");
+      }
+      
       const numberLabel = item.number_display || item.number || "";
       const cardName = (item.name || "").trim() || "Bez nazwy";
       const setName = (item.set_name || "").trim() || "Nieznany dodatek";
       const hasThumbnail = Boolean(item.image_small);
-      const cardAlt = `Miniatura karty ${cardName}`;
-      const quickAddLabel = `Dodaj kartę ${cardName} do kolekcji`;
+      const cardAlt = isProduct ? `Miniatura produktu ${cardName}` : `Miniatura karty ${cardName}`;
+      const quickAddLabel = isProduct ? `Dodaj produkt ${cardName} do kolekcji` : `Dodaj kartę ${cardName} do kolekcji`;
       const priceValue = getCardPriceValue(item);
       const priceText = priceValue === null ? "" : formatCardPrice(priceValue);
-      const collectionStatus = checkInCollection(item, "card");
+      const collectionStatus = checkInCollection(item, searchType);
+      
+      // Card specific
       const rarityRaw = (item.rarity || "").trim();
       const rarityText = rarityRaw || "Brak danych";
       const raritySymbol = (item.rarity_symbol || "").trim();
@@ -1799,13 +1809,16 @@
         );
       const setCodeRaw = (item.set_code || "").trim();
       const setCodeText = setCodeRaw || "—";
-      const rarityIconFromMap = raritySymbolIsImage ? null : resolveRarityIconUrl(rarityRaw);
-      const rarityIconUrl = raritySymbolIsImage
+      
+      // Only resolve icons/badges for cards
+      const rarityIconFromMap = !isProduct && raritySymbolIsImage ? null : resolveRarityIconUrl(rarityRaw);
+      const rarityIconUrl = !isProduct && raritySymbolIsImage
         ? raritySymbol
         : rarityIconFromMap;
       const hasRarityVisual = Boolean(rarityIconUrl);
       const rarityAlt = `Symbol rzadkości ${rarityText}`;
       const rarityFallback = rarityRaw ? rarityRaw.charAt(0).toUpperCase() : "?";
+      
       const { primary: setIconUrl, fallback: setIconFallbackUrl } = resolveSetIconUrl(item, { preferLocal: true });
       const setIconAltBase = setName && setName !== "Nieznany dodatek" ? setName : setCodeText;
       const setIconAlt = setIconAltBase ? `Symbol dodatku ${setIconAltBase}` : "Symbol dodatku";
@@ -1823,17 +1836,24 @@
           <span class="card-search-set-code card-search-set-fallback"${setIconFallbackHiddenAttr} data-card-set-code data-card-set-icon-fallback>${escapeHtml(setCodeText)}</span>
         </div>
       `;
-      const cardLinkParams = new URLSearchParams();
-      if (item.name) cardLinkParams.set("name", item.name);
-      if (item.number) cardLinkParams.set("number", item.number);
-      if (item.set_name) cardLinkParams.set("set_name", item.set_name);
-      if (item.set_code) cardLinkParams.set("set_code", item.set_code);
-      const cardLinkQuery = cardLinkParams.toString();
-      const cardLinkSetSegment = encodeURIComponent(item.set_code || item.set_name || "");
-      const cardLinkNumberSegment = encodeURIComponent(item.number || "");
-      const cardLink = `/cards/${cardLinkSetSegment}/${cardLinkNumberSegment}${cardLinkQuery ? `?${cardLinkQuery}` : ""}`;
-      const cardLinkLabel = `Zobacz kartę ${cardName}`;
-      const rarityIconMarkup = `
+      
+      // Links
+      let cardLink = "#";
+      let cardLinkLabel = isProduct ? cardName : `Zobacz kartę ${cardName}`;
+      
+      if (!isProduct) {
+          const cardLinkParams = new URLSearchParams();
+          if (item.name) cardLinkParams.set("name", item.name);
+          if (item.number) cardLinkParams.set("number", item.number);
+          if (item.set_name) cardLinkParams.set("set_name", item.set_name);
+          if (item.set_code) cardLinkParams.set("set_code", item.set_code);
+          const cardLinkQuery = cardLinkParams.toString();
+          const cardLinkSetSegment = encodeURIComponent(item.set_code || item.set_name || "");
+          const cardLinkNumberSegment = encodeURIComponent(item.number || "");
+          cardLink = `/cards/${cardLinkSetSegment}/${cardLinkNumberSegment}${cardLinkQuery ? `?${cardLinkQuery}` : ""}`;
+      }
+
+      const rarityIconMarkup = !isProduct ? `
         <div class="card-search-badge card-search-badge--rarity">
           <div class="card-search-rarity-icon">
             ${
@@ -1844,16 +1864,21 @@
             <span class="card-search-rarity-icon-fallback"${hasRarityVisual ? " hidden" : ""} data-card-rarity-icon-fallback aria-hidden="true">${escapeHtml(rarityFallback)}</span>
           </div>
         </div>
-      `;
-      const setBadgesGridMarkup = `
+      ` : "";
+      
+      const setBadgesGridMarkup = !isProduct ? `
         <div class="card-search-set-badges">
           ${setIconMarkup}
           ${rarityIconMarkup}
         </div>
-      `;
+      ` : "";
+      
       const numberDisplay = numberLabel || "—";
       const priceDisplay = priceText || "—";
+      
+      // --- Render Logic ---
       if (isListView) {
+        // List view implementation (simplified for brevity, kept mostly compatible)
         const previewImage = item.image_large || item.image_small || "";
         const hasPreviewImage = Boolean(previewImage);
         const thumbAttributes = hasPreviewImage ? " data-has-preview=\"true\"" : "";
@@ -1862,10 +1887,36 @@
           priceClasses.push("card-search-list-price--empty");
         }
         const priceAttributes = priceText ? " data-card-price" : "";
+        
+        // Form inputs
+        let formInputs = "";
+        if (isProduct) {
+            formInputs = `
+                <input type="hidden" name="product_name" value="${escapeHtml(item.name)}" />
+                <input type="hidden" name="product_set_name" value="${escapeHtml(item.set_name || "Inne")}" />
+                <input type="hidden" name="product_set_code" value="${escapeHtml(item.set_code || "")}" />
+                <input type="hidden" name="product_image_small" value="${escapeHtml(item.image_small || "")}" />
+                <input type="hidden" name="product_image_large" value="${escapeHtml(item.image_large || "")}" />
+                <input type="hidden" name="product_release_date" value="${escapeHtml(item.release_date || "")}" />
+                <input type="hidden" name="product_price" value="${item.price || ""}" />
+                <input type="hidden" name="product_price_7d_average" value="${item.price_7d_average || ""}" />
+            `;
+        } else {
+            formInputs = `
+                <input type="hidden" name="card_name" value="${escapeHtml(item.name)}" />
+                <input type="hidden" name="card_number" value="${escapeHtml(item.number)}" />
+                <input type="hidden" name="card_set_name" value="${escapeHtml(item.set_name)}" />
+                <input type="hidden" name="card_set_code" value="${escapeHtml(item.set_code || "")}" />
+                <input type="hidden" name="card_rarity" value="${escapeHtml(item.rarity || "")}" />
+                <input type="hidden" name="card_image_small" value="${escapeHtml(item.image_small || "")}" />
+                <input type="hidden" name="card_image_large" value="${escapeHtml(item.image_large || "")}" />
+            `;
+        }
+
         article.innerHTML = `
           <div class="card-search-list-row">
             <div class="card-search-list-thumb"${thumbAttributes}>
-              <a class="card-search-thumbnail-link" href="${escapeHtml(cardLink)}" aria-label="${escapeHtml(cardLinkLabel)}">
+              <a class="card-search-thumbnail-link" href="${escapeHtml(cardLink)}" aria-label="${escapeHtml(cardLinkLabel)}"${isProduct ? ` onclick="showProductModal(${JSON.stringify(item).replace(/"/g, '&quot;')}); return false;"` : ''}>
                 <svg class="card-search-list-icon" viewBox="0 0 48 48" role="img" aria-hidden="true">
                   <rect class="card-search-list-icon-frame" x="5" y="6" width="38" height="36" rx="6" />
                   <rect class="card-search-list-icon-stripe" x="11" y="14" width="26" height="6" rx="3" />
@@ -1881,25 +1932,19 @@
               }
             </div>
             <div class="card-search-list-set" title="${escapeHtml(setName)}">
-              ${setIconMarkup}
+              ${isProduct ? "" : setIconMarkup}
             </div>
             <h3 class="card-search-list-title card-search-list-name" title="${escapeHtml(cardName)}">
-              <a class="card-search-title-link" href="${escapeHtml(cardLink)}">${escapeHtml(cardName)}</a>
+              <a class="card-search-title-link" href="${escapeHtml(cardLink)}"${isProduct ? ` onclick="showProductModal(${JSON.stringify(item).replace(/"/g, '&quot;')}); return false;"` : ''}>${escapeHtml(cardName)}</a>
             </h3>
-            <div class="card-search-list-number">${escapeHtml(numberDisplay)}</div>
+            <div class="card-search-list-number">${isProduct ? "" : escapeHtml(numberDisplay)}</div>
             <div class="card-search-list-rarity" title="${escapeHtml(rarityText)}">
               ${rarityIconMarkup}
             </div>
             <div class="${priceClasses.join(" ")}"${priceAttributes}>
               <span class="card-search-list-price-value">${escapeHtml(priceDisplay)}</span>
               <form class="card-search-form" data-card-form>
-                <input type="hidden" name="card_name" value="${escapeHtml(item.name)}" />
-                <input type="hidden" name="card_number" value="${escapeHtml(item.number)}" />
-                <input type="hidden" name="card_set_name" value="${escapeHtml(item.set_name)}" />
-                <input type="hidden" name="card_set_code" value="${escapeHtml(item.set_code || "")}" />
-                <input type="hidden" name="card_rarity" value="${escapeHtml(item.rarity || "")}" />
-                <input type="hidden" name="card_image_small" value="${escapeHtml(item.image_small || "")}" />
-                <input type="hidden" name="card_image_large" value="${escapeHtml(item.image_large || "")}" />
+                ${formInputs}
                 <input type="hidden" name="quantity" value="1" />
                 <div class="form-footer">
                   <button
@@ -1917,10 +1962,76 @@
           </div>
         `;
       } else {
+        // GRID VIEW
+        let formInputs = "";
+        if (isProduct) {
+            formInputs = `
+                <input type="hidden" name="product_name" value="${escapeHtml(item.name)}" />
+                <input type="hidden" name="product_set_name" value="${escapeHtml(item.set_name || "Inne")}" />
+                <input type="hidden" name="product_set_code" value="${escapeHtml(item.set_code || "")}" />
+                <input type="hidden" name="product_image_small" value="${escapeHtml(item.image_small || "")}" />
+                <input type="hidden" name="product_image_large" value="${escapeHtml(item.image_large || "")}" />
+                <input type="hidden" name="product_release_date" value="${escapeHtml(item.release_date || "")}" />
+                <input type="hidden" name="product_price" value="${item.price || ""}" />
+                <input type="hidden" name="product_price_7d_average" value="${item.price_7d_average || ""}" />
+            `;
+        } else {
+            formInputs = `
+                <input type="hidden" name="card_name" value="${escapeHtml(item.name)}" />
+                <input type="hidden" name="card_number" value="${escapeHtml(item.number)}" />
+                <input type="hidden" name="card_set_name" value="${escapeHtml(item.set_name)}" />
+                <input type="hidden" name="card_set_code" value="${escapeHtml(item.set_code || "")}" />
+                <input type="hidden" name="card_rarity" value="${escapeHtml(item.rarity || "")}" />
+                <input type="hidden" name="card_image_small" value="${escapeHtml(item.image_small || "")}" />
+                <input type="hidden" name="card_image_large" value="${escapeHtml(item.image_large || "")}" />
+            `;
+        }
+
+        const productInfo = `
+            <div class="card-search-info">
+              <h3 class="text-base font-bold text-white leading-tight mb-1">
+                ${escapeHtml(cardName)}
+              </h3>
+              <p class="text-sm text-zinc-400 mb-2">
+                ${escapeHtml(setName)}
+              </p>
+              ${
+                priceText
+                  ? `<p class="card-search-price" data-card-price><span class="card-search-price-label">Cena:</span> <span class="card-search-price-value text-lg">${escapeHtml(priceText)}</span></p>`
+                  : ""
+              }
+            </div>
+        `;
+
+        const cardInfo = `
+            <div class="card-search-set">
+              ${setBadgesGridMarkup}
+            </div>
+            <div class="card-search-info">
+              <h3>
+                <a class="card-search-title-link" href="${escapeHtml(cardLink)}"${isProduct ? ` onclick="showProductModal(${JSON.stringify(item).replace(/"/g, '&quot;')}); return false;"` : ''}>${escapeHtml(cardName)}</a>
+              </h3>
+              <p class="card-search-info-meta">
+                <span class="card-search-set-name">${escapeHtml(setName)}</span>
+                ${
+                  numberLabel
+                    ? `<span class="card-search-info-divider" aria-hidden="true">•</span>
+                       <span class="card-search-info-number">${escapeHtml(numberLabel)}</span>`
+                    : ""
+                }
+              </p>
+              ${
+                priceText
+                  ? `<p class="card-search-price" data-card-price><span class="card-search-price-label">Cena:</span> <span class="card-search-price-value">${escapeHtml(priceText)}</span></p>`
+                  : ""
+              }
+            </div>
+        `;
+
         article.innerHTML = `
           <div class="card-search-media">
             <div class="card-search-thumbnail">
-              <a class="card-search-thumbnail-link" href="${escapeHtml(cardLink)}" aria-label="${escapeHtml(cardLinkLabel)}">
+              <a class="card-search-thumbnail-link" href="${escapeHtml(cardLink)}" aria-label="${escapeHtml(cardLinkLabel)}"${isProduct ? ` onclick="showProductModal(${JSON.stringify(item).replace(/"/g, '&quot;')}); return false;"` : ''}>
                 ${
                   hasThumbnail
                     ? `<img src="${escapeHtml(item.image_small)}" alt="${escapeHtml(cardAlt)}" loading="lazy" decoding="async" data-card-thumbnail />`
@@ -1932,28 +2043,7 @@
               </a>
               <div class="card-search-overlay">
                 <div class="card-search-overlay-content">
-                  <div class="card-search-set">
-                    ${setBadgesGridMarkup}
-                  </div>
-                  <div class="card-search-info">
-                    <h3>
-                      <a class="card-search-title-link" href="${escapeHtml(cardLink)}">${escapeHtml(cardName)}</a>
-                    </h3>
-                    <p class="card-search-info-meta">
-                      <span class="card-search-set-name">${escapeHtml(setName)}</span>
-                      ${
-                        numberLabel
-                          ? `<span class="card-search-info-divider" aria-hidden="true">•</span>
-                             <span class="card-search-info-number">${escapeHtml(numberLabel)}</span>`
-                          : ""
-                      }
-                    </p>
-                    ${
-                      priceText
-                        ? `<p class="card-search-price" data-card-price><span class="card-search-price-label">Cena:</span> <span class="card-search-price-value">${escapeHtml(priceText)}</span></p>`
-                        : ""
-                    }
-                  </div>
+                  ${isProduct ? productInfo : cardInfo}
                 </div>
               </div>
             </div>
@@ -1978,13 +2068,7 @@
             <span aria-hidden="true">+</span>
           </button>
           <form class="card-search-form" data-card-form>
-            <input type="hidden" name="card_name" value="${escapeHtml(item.name)}" />
-            <input type="hidden" name="card_number" value="${escapeHtml(item.number)}" />
-            <input type="hidden" name="card_set_name" value="${escapeHtml(item.set_name)}" />
-            <input type="hidden" name="card_set_code" value="${escapeHtml(item.set_code || "")}" />
-            <input type="hidden" name="card_rarity" value="${escapeHtml(item.rarity || "")}" />
-            <input type="hidden" name="card_image_small" value="${escapeHtml(item.image_small || "")}" />
-            <input type="hidden" name="card_image_large" value="${escapeHtml(item.image_large || "")}" />
+            ${formInputs}
             <label>
               Ilość
               <input type="number" name="quantity" min="0" step="1" value="1" />
@@ -1993,18 +2077,21 @@
               Cena zakupu
               <input type="number" name="purchase_price" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
             </label>
+            ${!isProduct ? `
             <label class="checkbox">
               <input type="checkbox" name="is_reverse" /> Reverse
             </label>
             <label class="checkbox">
               <input type="checkbox" name="is_holo" /> Holo
             </label>
+            ` : ''}
             <div class="form-footer">
               <button type="submit" class="button primary">Dodaj do kolekcji</button>
             </div>
           </form>
         `;
       }
+      
       const setIconElement = article.querySelector("[data-card-set-icon]");
       const setIconFallbackElement = article.querySelector("[data-card-set-icon-fallback]");
       if (setIconElement && setIconFallbackElement) {
@@ -2032,6 +2119,7 @@
           };
           thumbnail.addEventListener("error", handleThumbnailError, { once: true });
         }
+        // Only attach rarity error handler if element exists
         const rarityIcon = article.querySelector("[data-card-rarity-icon]");
         const rarityIconFallback = article.querySelector("[data-card-rarity-icon-fallback]");
         if (rarityIcon && rarityIconFallback) {
@@ -2190,6 +2278,7 @@
 
     const renderLatestResults = () => {
       const sortedItems = sortCardSearchItems(latestItems, currentCardSortOrder);
+      const searchType = form.querySelector("#search-type")?.value || "card";
       renderSearchResults(
         sortedItems,
         summary,
@@ -2198,6 +2287,7 @@
         latestPage,
         latestPerPage,
         currentCardViewMode,
+        searchType
       );
       applyViewMode(currentCardViewMode, { persist: false });
       updatePaginationControls();

@@ -252,19 +252,34 @@ def get_auction(
         AuctionMessage.auction_id == auction_id
     ).order_by(desc(AuctionMessage.timestamp)).limit(50).all()
     
-    # Get product/card name
+    # Get product/card details
     product_name = None
     card_name = None
+    card_set = None
+    card_number = None
+    card_price_market = None
+    card_price_psa = None
     
     if auction.product_id:
         product = db.query(Product).filter(Product.id == auction.product_id).first()
         if product:
             product_name = product.name
+            # Products might link to catalog too
+            if product.catalog_id:
+                cat = db.query(CardCatalog).filter(CardCatalog.id == product.catalog_id).first()
+                if cat:
+                    card_set = cat.set_name
+                    card_number = cat.number
+                    # Simple conversion or raw value
+                    card_price_market = cat.price_normal_eur
     
     if auction.catalog_id:
         card = db.query(CardCatalog).filter(CardCatalog.id == auction.catalog_id).first()
         if card:
             card_name = card.name
+            card_set = card.set_name
+            card_number = card.number
+            card_price_market = card.price_normal_eur
     
     # Build response
     auction_data = AuctionDetail.from_orm(auction)
@@ -272,6 +287,11 @@ def get_auction(
     auction_data.messages = [MessageRead.from_orm(msg) for msg in messages]
     auction_data.product_name = product_name
     auction_data.card_name = card_name
+    auction_data.card_set = card_set
+    auction_data.card_number = card_number
+    auction_data.card_price_market = card_price_market
+    # PSA price not currently in Catalog, leave None or implement fetch logic later
+    auction_data.card_price_psa = None
     
     computed = calculate_auction_fields(auction)
     auction_data.time_remaining = computed["time_remaining"]

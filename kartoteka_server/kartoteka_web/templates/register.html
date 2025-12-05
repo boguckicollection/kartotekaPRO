@@ -3,67 +3,51 @@
 
 {% block head_extra %}
 <style>
-/* Zinc Auth Styles (Shared) */
-.auth-section {
+/* Gradient Background matching App Theme */
+.auth-page {
   min-height: calc(100vh - 56px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #09090b;
+  background: radial-gradient(circle at top center, #18181b 0%, #09090b 100%);
   padding: 24px;
 }
 
-.auth-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+.auth-card {
   background: #18181b;
   border: 1px solid #27272a;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  max-width: 900px;
+  max-width: 400px;
   width: 100%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-@media (min-width: 768px) {
-  .auth-container {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.auth-info {
-  background: #000000;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-right: 1px solid #27272a;
-}
-
-.auth-form-wrapper {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, #6366f1, transparent);
+    opacity: 0.5;
 }
 
 .zinc-input {
   background: #09090b;
   border: 1px solid #27272a;
   color: #fafafa;
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-size: 13px;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
   width: 100%;
-  margin-top: 4px;
   transition: all 0.2s;
+  outline: none;
 }
 
 .zinc-input:focus {
   border-color: #6366f1;
-  outline: none;
   box-shadow: 0 0 0 1px #6366f1;
+  background: #000;
 }
 
 .zinc-label {
@@ -71,113 +55,73 @@
   font-size: 12px;
   font-weight: 500;
   color: #a1a1aa;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .zinc-btn {
   width: 100%;
-  background: #4f46e5;
+  background: linear-gradient(to right, #4f46e5, #4338ca);
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 8px;
+  transition: opacity 0.2s;
+  margin-top: 12px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .zinc-btn:hover {
-  background: #4338ca;
-}
-
-.feature-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.feature-icon {
-  width: 24px;
-  height: 24px;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 6px;
-  color: #6366f1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.feature-text {
-  font-size: 13px;
-  color: #a1a1aa;
-  line-height: 1.4;
+  opacity: 0.9;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="auth-section">
-  <div class="auth-container">
-    <!-- Left: Info -->
-    <div class="auth-info">
-      <div class="inline-flex items-center px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-medium text-indigo-400 uppercase tracking-wider mb-4 w-fit">
-        Rozpocznij przygodę
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="p-8">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 mb-4 border border-indigo-500/20">
+          <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-2">Stwórz konto</h1>
+        <p class="text-sm text-zinc-400">Dołącz do społeczności kolekcjonerów</p>
       </div>
-      <h1 class="text-2xl font-bold text-white mb-4">Stwórz konto trenera</h1>
-      <p class="text-sm text-zinc-400 leading-relaxed">
-        Dołącz do społeczności kolekcjonerów, aby bez wysiłku dokumentować swoje karty i otrzymywać aktualne wyceny.
-      </p>
-      
-      <div class="mt-8">
-        <div class="feature-item">
-          <div class="feature-icon">01</div>
-          <div class="feature-text">Błyskawiczne dodawanie kart wraz z wariantami reverse i holo.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">02</div>
-          <div class="feature-text">Automatyczne liczenie wartości portfela oraz liczby kart.</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">03</div>
-          <div class="feature-text">Pełna zgodność z aplikacją mobilną i tryb PWA.</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Right: Form -->
-    <div class="auth-form-wrapper">
-      <h2 class="text-lg font-semibold text-white mb-1">Nowe konto</h2>
-      <p class="text-xs text-zinc-500 mb-6">Uzupełnij dane, aby rozpocząć.</p>
+      <div class="alert bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2" id="register-alert" hidden>
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span></span>
+      </div>
       
-      <div class="alert bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-2 rounded text-xs mb-4" id="register-alert" hidden></div>
-      
-      <form id="register-form">
-        <label class="zinc-label">
-          Nazwa użytkownika
-          <input type="text" name="username" autocomplete="username" required class="zinc-input" />
-        </label>
+      <form id="register-form" class="space-y-5">
+        <div>
+            <label class="zinc-label">Nazwa użytkownika</label>
+            <input type="text" name="username" autocomplete="username" required class="zinc-input" placeholder="Wybierz login" />
+        </div>
         
-        <label class="zinc-label">
-          Adres e-mail (opcjonalnie)
-          <input type="email" name="email" autocomplete="email" class="zinc-input" />
-        </label>
+        <div>
+            <label class="zinc-label">Adres e-mail (opcjonalnie)</label>
+            <input type="email" name="email" autocomplete="email" class="zinc-input" placeholder="twoj@email.com" />
+        </div>
         
-        <label class="zinc-label">
-          Hasło
-          <input type="password" name="password" autocomplete="new-password" required minlength="6" class="zinc-input" />
-        </label>
+        <div>
+            <label class="zinc-label">Hasło</label>
+            <input type="password" name="password" autocomplete="new-password" required minlength="6" class="zinc-input" placeholder="Minimum 6 znaków" />
+        </div>
         
-        <button type="submit" class="zinc-btn">Utwórz konto</button>
-        
-        <p class="text-xs text-center mt-4 text-zinc-500">
-          Masz już konto? <a href="/login" class="text-indigo-400 hover:text-indigo-300 font-medium">Zaloguj się</a>
-        </p>
+        <button type="submit" class="zinc-btn">Zarejestruj się</button>
       </form>
+      
+      <div class="mt-6 text-center pt-6 border-t border-zinc-800">
+          <p class="text-sm text-zinc-500">
+            Masz już konto? <a href="/login" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Zaloguj się</a>
+          </p>
+      </div>
     </div>
   </div>
 </section>

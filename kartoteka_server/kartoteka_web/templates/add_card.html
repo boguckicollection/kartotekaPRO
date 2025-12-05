@@ -173,6 +173,19 @@
   padding: 8px 16px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Product Specific Styles */
+.card-search-results--product.card-search-results--grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.card-search-item--product .card-search-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.3) 100%);
+}
+
+.card-search-item--product .card-search-info {
+    padding-bottom: 4px;
+}
 </style>
 {% endblock %}
 
@@ -364,5 +377,104 @@
         }
     }
   });
+</script>
+
+<!-- Product Info Modal -->
+<div id="product-info-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" aria-hidden="true">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="product-modal-content">
+    <div class="p-6">
+      <div class="flex justify-between items-start mb-4">
+        <h3 class="text-xl font-bold text-white">Szczegóły produktu</h3>
+        <button type="button" onclick="closeProductModal()" class="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div id="product-modal-body" class="space-y-4">
+        <!-- Product details will be inserted here -->
+      </div>
+      
+      <div class="mt-6 flex justify-end">
+        <button type="button" onclick="closeProductModal()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors">
+          Zamknij
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function closeProductModal() {
+  const modal = document.getElementById('product-info-modal');
+  const content = document.getElementById('product-modal-content');
+  modal.classList.add('opacity-0');
+  content.classList.remove('scale-100');
+  content.classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    modal.classList.remove('opacity-0');
+  }, 300);
+}
+
+function showProductModal(product) {
+  const modal = document.getElementById('product-info-modal');
+  const content = document.getElementById('product-modal-content');
+  const body = document.getElementById('product-modal-body');
+  
+  // Populate modal content
+  body.innerHTML = `
+    <div class="space-y-3">
+      <div>
+        <label class="text-sm text-zinc-500">Nazwa</label>
+        <p class="text-white font-medium">${product.name || 'Brak danych'}</p>
+      </div>
+      <div>
+        <label class="text-sm text-zinc-500">Set</label>
+        <p class="text-white">${product.set_name || 'Inne'}</p>
+      </div>
+      ${product.set_code ? `
+      <div>
+        <label class="text-sm text-zinc-500">Kod setu</label>
+        <p class="text-white">${product.set_code}</p>
+      </div>
+      ` : ''}
+      ${product.release_date ? `
+      <div>
+        <label class="text-sm text-zinc-500">Data wydania</label>
+        <p class="text-white">${product.release_date}</p>
+      </div>
+      ` : ''}
+      <div>
+        <label class="text-sm text-zinc-500">Cena</label>
+        <p class="text-lg font-bold text-emerald-400">
+          ${product.price ? parseFloat(product.price).toFixed(2) + ' PLN' : 'Brak danych'}
+        </p>
+      </div>
+      ${product.price_7d_average ? `
+      <div>
+        <label class="text-sm text-zinc-500">Średnia cena (7 dni)</label>
+        <p class="text-white">${parseFloat(product.price_7d_average).toFixed(2)} PLN</p>
+      </div>
+      ` : ''}
+    </div>
+  `;
+  
+  // Show modal with animation
+  modal.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    modal.classList.remove('opacity-0');
+    content.classList.remove('scale-95');
+    content.classList.add('scale-100');
+  });
+}
+
+// Close modal when clicking outside
+document.getElementById('product-info-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeProductModal();
+  }
+});
 </script>
 {% endblock %}
