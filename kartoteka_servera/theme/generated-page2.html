@@ -1,0 +1,772 @@
+<html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault | TCG Portfolio Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b; /* Zinc 950 */
+            color: #f4f4f5; /* Zinc 100 */
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #18181b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 3px;
+        }
+
+        /* Hide scrollbar for horizontal scrolling areas but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Chart Gradient */
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 100%);
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .active-nav {
+            background-color: #27272a;
+            color: #fff;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(var(--border))",
+                        input: "hsl(var(--input))",
+                        ring: "hsl(var(--ring))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                    },
+                    letterSpacing: {
+                        tighter: '-0.04em',
+                        tight: '-0.02em',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="antialiased h-screen flex overflow-hidden bg-zinc-950 text-zinc-200">
+
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside class="hidden md:flex flex-col w-64 border-r border-zinc-800 bg-zinc-950 h-full">
+        <div class="p-6 flex items-center gap-2">
+            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                <div class="w-3 h-3 bg-black rounded-sm"></div>
+            </div>
+            <span class="font-semibold tracking-tight text-white">VAULT</span>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1">
+            <button onclick="navigateTo('home')" id="nav-home" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-zinc-400 rounded-md hover:bg-zinc-900 hover:text-white transition-colors">
+                <i data-lucide="home" class="w-4 h-4"></i>
+                Dashboard
+            </button>
+            <button onclick="navigateTo('collection')" id="nav-collection" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-zinc-400 rounded-md hover:bg-zinc-900 hover:text-white transition-colors active-nav">
+                <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                Collection
+            </button>
+            <button onclick="navigateTo('search')" id="nav-search" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-zinc-400 rounded-md hover:bg-zinc-900 hover:text-white transition-colors">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Search Database
+            </button>
+            <button onclick="navigateTo('account')" id="nav-account" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-zinc-400 rounded-md hover:bg-zinc-900 hover:text-white transition-colors">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                Settings
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-zinc-800">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500"></div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-white">Alex Chen</span>
+                    <span class="text-xs text-zinc-500">Pro Plan</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Tab Bar (Bottom) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-950 border-t border-zinc-800 flex justify-around items-center z-50">
+        <button onclick="navigateTo('home')" class="flex flex-col items-center gap-1 text-zinc-500">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[10px]">Home</span>
+        </button>
+        <button onclick="navigateTo('collection')" class="flex flex-col items-center gap-1 text-white">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+            <span class="text-[10px]">Portfolio</span>
+        </button>
+        <button onclick="navigateTo('search')" class="flex flex-col items-center gap-1 text-zinc-500">
+            <i data-lucide="search" class="w-5 h-5"></i>
+            <span class="text-[10px]">Search</span>
+        </button>
+        <button onclick="navigateTo('account')" class="flex flex-col items-center gap-1 text-zinc-500">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[10px]">Account</span>
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-auto relative bg-black md:bg-zinc-950" id="main-content">
+        
+        <!-- PAGE 1: HOME -->
+        <div id="page-home" class="hidden p-6 md:p-8 max-w-5xl mx-auto pb-24">
+            <header class="mb-8">
+                <h1 class="text-lg md:text-xl font-medium tracking-tight text-white">Good Morning, Alex</h1>
+                <p class="text-sm text-zinc-500 mt-1">Here's what's happening in the TCG market today.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Quick Stats -->
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                                <i data-lucide="trending-up" class="w-4 h-4 text-emerald-500"></i>
+                                Market Movers
+                            </h2>
+                            <span class="text-xs text-zinc-500">Updated 10m ago</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 hover:bg-zinc-800 rounded transition-colors cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-10 bg-indigo-900/30 border border-indigo-500/30 rounded-sm"></div>
+                                    <div>
+                                        <div class="text-xs font-medium text-white">Sheoldred, the Apocalypse</div>
+                                        <div class="text-[10px] text-zinc-500">MTG • Dominaria United</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-medium text-white">$84.20</div>
+                                    <div class="text-[10px] text-emerald-400">+12.4%</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center p-2 hover:bg-zinc-800 rounded transition-colors cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-10 bg-yellow-900/30 border border-yellow-500/30 rounded-sm"></div>
+                                    <div>
+                                        <div class="text-xs font-medium text-white">Charizard ex</div>
+                                        <div class="text-[10px] text-zinc-500">Pokemon • Obsidian Flames</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-medium text-white">$215.00</div>
+                                    <div class="text-[10px] text-emerald-400">+8.1%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- News Feed -->
+                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+                        <div class="px-5 py-4 border-b border-zinc-800 flex justify-between items-center">
+                            <h2 class="text-sm font-medium text-zinc-300">Industry News</h2>
+                            <button class="text-xs text-indigo-400 hover:text-indigo-300">View RSS</button>
+                        </div>
+                        <div class="divide-y divide-zinc-800/50">
+                            <div class="p-5 hover:bg-zinc-800/30 transition-colors cursor-pointer">
+                                <div class="flex gap-3 mb-1">
+                                    <span class="text-[10px] font-medium text-purple-400 bg-purple-400/10 px-1.5 py-0.5 rounded">Magic: The Gathering</span>
+                                    <span class="text-[10px] text-zinc-500">2 hours ago</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-zinc-200 mb-1">Wizards Announces "Fallout" Commander Deck Delays</h3>
+                                <p class="text-xs text-zinc-500 leading-relaxed line-clamp-2">Production issues have caused a slight delay in the shipping of the highly anticipated Fallout collaboration decks for European distributors.</p>
+                            </div>
+                            <div class="p-5 hover:bg-zinc-800/30 transition-colors cursor-pointer">
+                                <div class="flex gap-3 mb-1">
+                                    <span class="text-[10px] font-medium text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded">One Piece</span>
+                                    <span class="text-[10px] text-zinc-500">5 hours ago</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-zinc-200 mb-1">OP-06 Wings of the Captain Pull Rates Revealed</h3>
+                                <p class="text-xs text-zinc-500 leading-relaxed line-clamp-2">Early box openings suggest that alternate art leaders are appearing at a frequency of approximately 1 per 3 cases.</p>
+                            </div>
+                            <div class="p-5 hover:bg-zinc-800/30 transition-colors cursor-pointer">
+                                <div class="flex gap-3 mb-1">
+                                    <span class="text-[10px] font-medium text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded">Dragon Ball</span>
+                                    <span class="text-[10px] text-zinc-500">Yesterday</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-zinc-200 mb-1">Bandai Namco unveils new Fusion World mechanics</h3>
+                                <p class="text-xs text-zinc-500 leading-relaxed line-clamp-2">The upcoming digital and physical hybrid game will feature streamlined energy systems compared to Masters.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Releases Sidebar -->
+                <div class="space-y-4">
+                    <h2 class="text-sm font-medium text-zinc-400">New Releases</h2>
+                    <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 space-y-4">
+                        <div class="group cursor-pointer">
+                            <div class="aspect-[4/3] bg-zinc-800 rounded mb-2 relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                                <img src="https://placehold.co/400x300/18181b/27272a?text=Ixalan" class="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" alt="Set">
+                                <div class="absolute bottom-2 left-3 z-20">
+                                    <div class="text-[10px] text-indigo-300 font-medium uppercase tracking-wider">Available Now</div>
+                                    <div class="text-sm font-medium text-white">Lost Caverns of Ixalan</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-zinc-500">Booster Box</span>
+                                <span class="text-xs font-medium text-zinc-200">$115.99</span>
+                            </div>
+                        </div>
+
+                        <div class="group cursor-pointer">
+                            <div class="aspect-[4/3] bg-zinc-800 rounded mb-2 relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                                <img src="https://placehold.co/400x300/18181b/27272a?text=Paradox+Rift" class="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" alt="Set">
+                                <div class="absolute bottom-2 left-3 z-20">
+                                    <div class="text-[10px] text-yellow-300 font-medium uppercase tracking-wider">Pre-Order</div>
+                                    <div class="text-sm font-medium text-white">Paradox Rift</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-zinc-500">Elite Trainer Box</span>
+                                <span class="text-xs font-medium text-zinc-200">$44.99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: COLLECTION (DEFAULT / ACTIVE) -->
+        <div id="page-collection" class="p-6 md:p-8 max-w-7xl mx-auto pb-24">
+            
+            <!-- Value Chart Section -->
+            <section class="mb-8 relative">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+                    <div>
+                        <h2 class="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-1">Total Portfolio Value</h2>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-3xl md:text-4xl font-medium tracking-tighter text-white">$12,845.50</span>
+                            <div class="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded text-xs font-medium">
+                                <i data-lucide="arrow-up-right" class="w-3 h-3 mr-1"></i>
+                                2.4% ($305.20)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start md:self-end">
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">1D</button>
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">1W</button>
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-900 bg-white rounded shadow-sm">1M</button>
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">3M</button>
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">1Y</button>
+                        <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">ALL</button>
+                    </div>
+                </div>
+
+                <!-- SVG Chart Area -->
+                <div class="w-full h-64 relative border-b border-zinc-800">
+                    <!-- Grid Lines -->
+                    <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                        <div class="w-full h-px bg-zinc-800/30 border-t border-dashed border-zinc-800"></div>
+                        <div class="w-full h-px bg-zinc-800/30 border-t border-dashed border-zinc-800"></div>
+                        <div class="w-full h-px bg-zinc-800/30 border-t border-dashed border-zinc-800"></div>
+                        <div class="w-full h-px bg-zinc-800/30 border-t border-dashed border-zinc-800"></div>
+                        <div class="w-full h-px bg-zinc-800/30 border-t border-dashed border-zinc-800"></div>
+                    </div>
+                    
+                    <!-- Graph -->
+                    <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 200">
+                        <defs>
+                            <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.2"></stop>
+                                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,150 Q100,140 200,100 T400,120 T600,60 T800,80 T1000,20 V200 H0 Z" fill="url(#gradient)"></path>
+                        <path d="M0,150 Q100,140 200,100 T400,120 T600,60 T800,80 T1000,20" fill="none" stroke="#6366f1" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+                        
+                        <!-- Interactive Point -->
+                        <circle cx="1000" cy="20" r="4" fill="#818cf8" stroke="white" stroke-width="2"></circle>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Inventory Section Controls -->
+            <div class="sticky top-0 z-30 bg-black md:bg-zinc-950 pt-4 pb-4 border-b border-zinc-800 mb-6">
+                <div class="flex flex-col lg:flex-row justify-between gap-4">
+                    <!-- Game Filter Tabs -->
+                    <div class="flex overflow-x-auto no-scrollbar items-center gap-2">
+                        <button class="whitespace-nowrap px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-900 rounded-md shadow-sm transition-all">All Cards</button>
+                        <button class="whitespace-nowrap px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-md transition-all">Magic: The Gathering</button>
+                        <button class="whitespace-nowrap px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-md transition-all">Pokemon</button>
+                        <button class="whitespace-nowrap px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-md transition-all">One Piece</button>
+                        <button class="whitespace-nowrap px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-md transition-all">Dragon Ball</button>
+                    </div>
+
+                    <!-- View Toggles & Search -->
+                    <div class="flex items-center gap-3">
+                        <div class="relative group">
+                            <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500"></i>
+                            <input type="text" placeholder="Filter collection..." class="pl-8 pr-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 w-48 transition-all">
+                        </div>
+                        <div class="h-4 w-px bg-zinc-800"></div>
+                        <div class="flex bg-zinc-900 rounded-md border border-zinc-800 p-0.5">
+                            <button onclick="toggleCollectionView('list')" id="btn-list" class="p-1 rounded bg-zinc-700 text-white shadow-sm">
+                                <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="toggleCollectionView('grid')" id="btn-grid" class="p-1 rounded text-zinc-500 hover:text-zinc-300">
+                                <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <button class="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-md transition-colors">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span class="hidden sm:inline">Add Card</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List View (Table) -->
+            <div id="collection-list-view" class="w-full">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-zinc-800">
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500 w-12">#</th>
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500">Card Name</th>
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500">Set / Expansion</th>
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500">Condition</th>
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500 text-right">Market Price</th>
+                                <th class="py-3 px-4 text-xs font-medium text-zinc-500 text-right">24h %</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-800/50 text-sm">
+                            <!-- Row 1 -->
+                            <tr class="group hover:bg-zinc-900/50 transition-colors">
+                                <td class="py-3 px-4 text-zinc-500 text-xs">1</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-11 rounded bg-gradient-to-br from-slate-700 to-slate-600 shadow-sm border border-zinc-700/50 flex-shrink-0"></div>
+                                        <div>
+                                            <div class="font-medium text-zinc-200">Black Lotus</div>
+                                            <div class="text-[10px] text-zinc-500 block md:hidden">Unlimited • NM</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-zinc-400 text-xs">Unlimited Edition (MTG)</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">NM</span>
+                                </td>
+                                <td class="py-3 px-4 text-right font-medium text-zinc-200">$11,250.00</td>
+                                <td class="py-3 px-4 text-right text-xs text-emerald-500 font-medium">+1.2%</td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="group hover:bg-zinc-900/50 transition-colors">
+                                <td class="py-3 px-4 text-zinc-500 text-xs">2</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-11 rounded bg-gradient-to-br from-yellow-600 to-yellow-500 shadow-sm border border-zinc-700/50 flex-shrink-0"></div>
+                                        <div>
+                                            <div class="font-medium text-zinc-200">Charizard (Base Set)</div>
+                                            <div class="text-[10px] text-zinc-500 block md:hidden">Base Set • LP</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-zinc-400 text-xs">Base Set (PKMN)</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">LP</span>
+                                </td>
+                                <td class="py-3 px-4 text-right font-medium text-zinc-200">$350.00</td>
+                                <td class="py-3 px-4 text-right text-xs text-red-400 font-medium">-0.5%</td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="group hover:bg-zinc-900/50 transition-colors">
+                                <td class="py-3 px-4 text-zinc-500 text-xs">3</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-11 rounded bg-gradient-to-br from-blue-600 to-blue-500 shadow-sm border border-zinc-700/50 flex-shrink-0"></div>
+                                        <div>
+                                            <div class="font-medium text-zinc-200">Monkey.D.Luffy (Manga Alt Art)</div>
+                                            <div class="text-[10px] text-zinc-500 block md:hidden">OP05 • NM</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-zinc-400 text-xs">Awakening of the New Era (OP)</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">Graded 10</span>
+                                </td>
+                                <td class="py-3 px-4 text-right font-medium text-zinc-200">$1,100.00</td>
+                                <td class="py-3 px-4 text-right text-xs text-emerald-500 font-medium">+5.4%</td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr class="group hover:bg-zinc-900/50 transition-colors">
+                                <td class="py-3 px-4 text-zinc-500 text-xs">4</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-11 rounded bg-gradient-to-br from-orange-600 to-orange-500 shadow-sm border border-zinc-700/50 flex-shrink-0"></div>
+                                        <div>
+                                            <div class="font-medium text-zinc-200">Son Goku (Awakened Power)</div>
+                                            <div class="text-[10px] text-zinc-500 block md:hidden">ToP • NM</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-zinc-400 text-xs">Tournament of Power (DBS)</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">NM</span>
+                                </td>
+                                <td class="py-3 px-4 text-right font-medium text-zinc-200">$85.00</td>
+                                <td class="py-3 px-4 text-right text-xs text-zinc-500 font-medium">0.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Grid View (Hidden by default) -->
+            <div id="collection-grid-view" class="hidden grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <!-- Card 1 -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-3 hover:border-zinc-600 transition-colors group">
+                    <div class="aspect-[2.5/3.5] rounded bg-gradient-to-tr from-slate-800 to-slate-700 mb-3 relative">
+                         <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] font-medium text-white border border-white/10">NM</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-white truncate">Black Lotus</div>
+                        <div class="text-[10px] text-zinc-500 truncate">Unlimited Edition</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-xs font-semibold text-white">$11,250</div>
+                            <div class="text-[10px] text-emerald-500">+1.2%</div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Card 2 -->
+                 <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-3 hover:border-zinc-600 transition-colors group">
+                    <div class="aspect-[2.5/3.5] rounded bg-gradient-to-tr from-yellow-700 to-yellow-600 mb-3 relative">
+                        <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] font-medium text-white border border-white/10">LP</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-white truncate">Charizard</div>
+                        <div class="text-[10px] text-zinc-500 truncate">Base Set</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-xs font-semibold text-white">$350.00</div>
+                            <div class="text-[10px] text-red-400">-0.5%</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-3 hover:border-zinc-600 transition-colors group">
+                    <div class="aspect-[2.5/3.5] rounded bg-gradient-to-tr from-blue-700 to-cyan-600 mb-3 relative">
+                        <div class="absolute top-2 right-2 bg-indigo-500 px-1.5 py-0.5 rounded text-[10px] font-medium text-white shadow-lg shadow-indigo-500/20">PSA 10</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-white truncate">Monkey.D.Luffy</div>
+                        <div class="text-[10px] text-zinc-500 truncate">OP05 • Manga Rare</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-xs font-semibold text-white">$1,100</div>
+                            <div class="text-[10px] text-emerald-500">+5.4%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: SEARCH -->
+        <div id="page-search" class="hidden p-6 md:p-8 max-w-5xl mx-auto pb-24">
+            <div class="flex flex-col items-center max-w-2xl mx-auto mb-12 text-center">
+                <h1 class="text-2xl font-semibold tracking-tight mb-2">Card Database</h1>
+                <p class="text-zinc-400 text-sm mb-8">Search prices and stats across 40,000+ cards from Magic, Pokemon, One Piece and Dragon Ball.</p>
+                
+                <div class="w-full relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-5 w-5 text-zinc-500"></i>
+                    </div>
+                    <input type="text" class="block w-full pl-11 pr-4 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-lg shadow-black/50" placeholder="Search by card name (e.g. 'Pikachu illustrator')...">
+                    <div class="absolute inset-y-0 right-3 flex items-center">
+                        <span class="text-[10px] text-zinc-600 border border-zinc-800 px-2 py-1 rounded hidden sm:block">CMD + K</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mt-4">
+                    <button class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 hover:border-zinc-600 transition-colors">Magic: The Gathering</button>
+                    <button class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 hover:border-zinc-600 transition-colors">Pokemon</button>
+                    <button class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 hover:border-zinc-600 transition-colors">One Piece</button>
+                </div>
+            </div>
+
+            <!-- Results Header -->
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-zinc-800">
+                <span class="text-sm text-zinc-400">Trending Searches</span>
+                <div class="flex bg-zinc-900 rounded-md border border-zinc-800 p-0.5">
+                    <button onclick="toggleSearchView('list')" id="search-btn-list" class="p-1 rounded text-zinc-500 hover:text-zinc-300">
+                        <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="toggleSearchView('grid')" id="search-btn-grid" class="p-1 rounded bg-zinc-700 text-white shadow-sm">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Grid Results -->
+            <div id="search-grid-view" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Item 1 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[2.5/3.5] bg-zinc-800 rounded-lg mb-3 relative overflow-hidden card-hover">
+                         <div class="absolute inset-0 flex items-center justify-center text-zinc-700">
+                            <i data-lucide="image" class="w-8 h-8"></i>
+                         </div>
+                         <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    <h3 class="text-sm font-medium text-zinc-200">The One Ring</h3>
+                    <div class="flex justify-between mt-1">
+                        <span class="text-xs text-zinc-500">LOTR: Tales</span>
+                        <span class="text-xs font-medium text-white">$45.00</span>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[2.5/3.5] bg-zinc-800 rounded-lg mb-3 relative overflow-hidden card-hover">
+                         <div class="absolute inset-0 flex items-center justify-center text-zinc-700">
+                            <i data-lucide="image" class="w-8 h-8"></i>
+                         </div>
+                    </div>
+                    <h3 class="text-sm font-medium text-zinc-200">Nami (Alt Art)</h3>
+                    <div class="flex justify-between mt-1">
+                        <span class="text-xs text-zinc-500">Romance Dawn</span>
+                        <span class="text-xs font-medium text-white">$210.00</span>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[2.5/3.5] bg-zinc-800 rounded-lg mb-3 relative overflow-hidden card-hover">
+                         <div class="absolute inset-0 flex items-center justify-center text-zinc-700">
+                            <i data-lucide="image" class="w-8 h-8"></i>
+                         </div>
+                    </div>
+                    <h3 class="text-sm font-medium text-zinc-200">Sol Ring</h3>
+                    <div class="flex justify-between mt-1">
+                        <span class="text-xs text-zinc-500">Commander Masters</span>
+                        <span class="text-xs font-medium text-white">$1.50</span>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="group cursor-pointer">
+                    <div class="aspect-[2.5/3.5] bg-zinc-800 rounded-lg mb-3 relative overflow-hidden card-hover">
+                         <div class="absolute inset-0 flex items-center justify-center text-zinc-700">
+                            <i data-lucide="image" class="w-8 h-8"></i>
+                         </div>
+                    </div>
+                    <h3 class="text-sm font-medium text-zinc-200">Gogeta</h3>
+                    <div class="flex justify-between mt-1">
+                        <span class="text-xs text-zinc-500">Fusion World</span>
+                        <span class="text-xs font-medium text-white">$12.00</span>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Search List View (Hidden Default) -->
+             <div id="search-list-view" class="hidden w-full">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800 rounded hover:bg-zinc-900 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-14 bg-zinc-800 rounded"></div>
+                            <div>
+                                <div class="text-sm font-medium text-white">The One Ring</div>
+                                <div class="text-xs text-zinc-500">Lord of the Rings: Tales of Middle-earth</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-white">$45.00</div>
+                            <button class="text-[10px] text-indigo-400 hover:underline">View Details</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800 rounded hover:bg-zinc-900 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-14 bg-zinc-800 rounded"></div>
+                            <div>
+                                <div class="text-sm font-medium text-white">Nami (Alt Art)</div>
+                                <div class="text-xs text-zinc-500">Romance Dawn (OP-01)</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-white">$210.00</div>
+                            <button class="text-[10px] text-indigo-400 hover:underline">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 4: ACCOUNT -->
+        <div id="page-account" class="hidden p-6 md:p-8 max-w-3xl mx-auto pb-24">
+            <h1 class="text-xl font-semibold tracking-tight mb-1">Account Settings</h1>
+            <p class="text-sm text-zinc-500 mb-8">Manage your profile and preferences.</p>
+
+            <div class="space-y-8">
+                <!-- Profile Section -->
+                <section class="border border-zinc-800 rounded-lg p-6 bg-zinc-900/30">
+                    <h2 class="text-base font-medium mb-4">Profile</h2>
+                    <div class="flex items-center gap-6 mb-6">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-2xl font-semibold">AC</div>
+                        <button class="px-4 py-2 border border-zinc-700 rounded-md text-xs font-medium text-zinc-300 hover:bg-zinc-800 transition-colors">Change Avatar</button>
+                    </div>
+                    <div class="grid gap-4 max-w-md">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5">Display Name</label>
+                            <input type="text" value="Alex Chen" class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-400 mb-1.5">Email Address</label>
+                            <input type="email" value="alex@example.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Preferences -->
+                <section class="border border-zinc-800 rounded-lg p-6 bg-zinc-900/30">
+                    <h2 class="text-base font-medium mb-4">Preferences</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium">Default Game</div>
+                                <div class="text-xs text-zinc-500">Which game should appear first in filters?</div>
+                            </div>
+                            <select class="bg-zinc-950 border border-zinc-800 text-sm rounded-md px-2 py-1 text-zinc-300 focus:outline-none">
+                                <option>Magic: The Gathering</option>
+                                <option>Pokemon</option>
+                                <option>One Piece</option>
+                                <option>Dragon Ball</option>
+                            </select>
+                        </div>
+                        <div class="h-px bg-zinc-800"></div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium">Currency</div>
+                                <div class="text-xs text-zinc-500">Display prices in your local currency.</div>
+                            </div>
+                            <select class="bg-zinc-950 border border-zinc-800 text-sm rounded-md px-2 py-1 text-zinc-300 focus:outline-none">
+                                <option>USD ($)</option>
+                                <option>EUR (€)</option>
+                                <option>GBP (£)</option>
+                                <option>JPY (¥)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="flex justify-end">
+                    <button class="px-4 py-2 bg-white text-black text-sm font-medium rounded-md hover:bg-zinc-200 transition-colors">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Navigation Logic
+        function navigateTo(pageId) {
+            // Hide all pages
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-collection').classList.add('hidden');
+            document.getElementById('page-search').classList.add('hidden');
+            document.getElementById('page-account').classList.add('hidden');
+
+            // Show selected page
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+
+            // Update Desktop Sidebar State
+            const navIds = ['nav-home', 'nav-collection', 'nav-search', 'nav-account'];
+            navIds.forEach(id => {
+                document.getElementById(id).classList.remove('active-nav', 'text-white');
+                document.getElementById(id).classList.add('text-zinc-400');
+            });
+
+            const activeBtn = document.getElementById('nav-' + pageId);
+            if(activeBtn) {
+                activeBtn.classList.add('active-nav', 'text-white');
+                activeBtn.classList.remove('text-zinc-400');
+            }
+        }
+
+        // Collection View Toggle Logic
+        function toggleCollectionView(viewType) {
+            const listBtn = document.getElementById('btn-list');
+            const gridBtn = document.getElementById('btn-grid');
+            const listView = document.getElementById('collection-list-view');
+            const gridView = document.getElementById('collection-grid-view');
+
+            if(viewType === 'list') {
+                listView.classList.remove('hidden');
+                gridView.classList.add('hidden');
+                
+                listBtn.classList.add('bg-zinc-700', 'text-white', 'shadow-sm');
+                listBtn.classList.remove('text-zinc-500');
+                gridBtn.classList.remove('bg-zinc-700', 'text-white', 'shadow-sm');
+                gridBtn.classList.add('text-zinc-500');
+            } else {
+                listView.classList.add('hidden');
+                gridView.classList.remove('hidden');
+                gridView.classList.add('grid');
+
+                gridBtn.classList.add('bg-zinc-700', 'text-white', 'shadow-sm');
+                gridBtn.classList.remove('text-zinc-500');
+                listBtn.classList.remove('bg-zinc-700', 'text-white', 'shadow-sm');
+                listBtn.classList.add('text-zinc-500');
+            }
+        }
+
+        // Search View Toggle Logic
+        function toggleSearchView(viewType) {
+            const listBtn = document.getElementById('search-btn-list');
+            const gridBtn = document.getElementById('search-btn-grid');
+            const listView = document.getElementById('search-list-view');
+            const gridView = document.getElementById('search-grid-view');
+
+            if(viewType === 'list') {
+                listView.classList.remove('hidden');
+                gridView.classList.add('hidden');
+                
+                listBtn.classList.add('bg-zinc-700', 'text-white', 'shadow-sm');
+                listBtn.classList.remove('text-zinc-500');
+                gridBtn.classList.remove('bg-zinc-700', 'text-white', 'shadow-sm');
+                gridBtn.classList.add('text-zinc-500');
+            } else {
+                listView.classList.add('hidden');
+                gridView.classList.remove('hidden');
+                
+                gridBtn.classList.add('bg-zinc-700', 'text-white', 'shadow-sm');
+                gridBtn.classList.remove('text-zinc-500');
+                listBtn.classList.remove('bg-zinc-700', 'text-white', 'shadow-sm');
+                listBtn.classList.add('text-zinc-500');
+            }
+        }
+
+        // Default init
+        navigateTo('collection');
+    </script>
+
+</body></html>

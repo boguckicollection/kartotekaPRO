@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+{% block title %}Strona główna - Kartoteka{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Zinc Dark Mode Override */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #09090b !important;
+    color: #f4f4f5;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #18181b;
+}
+::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+    border-radius: 3px;
+}
+
+/* Card hover effects */
+.zinc-card-hover {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.zinc-card-hover:hover {
+    transform: translateY(-2px);
+    border-color: #52525b;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Compact Hero Section - Zinc Style -->
+<section class="relative bg-zinc-950 border-b border-zinc-800">
+  <div class="container mx-auto px-4 py-8 md:py-10">
+    <div class="grid lg:grid-cols-2 gap-6 items-center max-w-6xl mx-auto">
+      
+      <!-- Hero Content -->
+      <div class="space-y-3">
+        {% if username %}
+        <div class="inline-flex items-center px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-medium text-indigo-400 uppercase tracking-wider">
+          Witaj ponownie 👋
+        </div>
+        <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+          Cześć, <span class="text-indigo-400">{{ username }}</span>!
+        </h1>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Twoja kolekcja Pokemon TCG czeka. Sprawdź najnowsze zmiany i dodaj nowe karty do portfolio.
+        </p>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <a href="/collection" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-md transition-colors">
+            <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+            Moja kolekcja
+          </a>
+          <a href="/cards/add" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white text-xs font-medium rounded-md transition-colors">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+            Dodaj karty
+          </a>
+        </div>
+        {% else %}
+        <div class="inline-flex items-center px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-medium text-indigo-400 uppercase tracking-wider">
+          Pokemon TCG Manager
+        </div>
+        <h1 class="text-2xl md:text-4xl font-semibold tracking-tight text-white leading-tight">
+          Zarządzaj swoją kolekcją <span class="text-indigo-400">Pokemon TCG</span>
+        </h1>
+        <p class="text-sm text-zinc-400 leading-relaxed max-w-xl">
+          Kataloguj karty, śledź wartość portfolio i bądź na bieżąco z trendami rynkowymi. Wszystko w jednym miejscu, dostępne z każdego urządzenia.
+        </p>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <a href="/login" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-md transition-colors">
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+            Zaloguj się
+          </a>
+          <a href="/register" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white text-xs font-medium rounded-md transition-colors">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            Załóż konto
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Hero Stats/Features -->
+      <div>
+        {% if username and collection_stats %}
+        <!-- Stats Card -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-5">
+          <h2 class="text-sm font-medium text-zinc-300 flex items-center gap-2 mb-4">
+            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-500"></i>
+            Twoja kolekcja
+          </h2>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-md p-3">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Wartość całkowita</div>
+              <div class="text-xl font-semibold text-emerald-400">{{ "%.2f"|format(collection_stats.total_value) }}</div>
+              <div class="text-[10px] text-zinc-500">PLN</div>
+            </div>
+            
+            <div class="bg-zinc-900 border border-zinc-800 rounded-md p-3">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Karty</div>
+              <div class="text-xl font-semibold text-indigo-400">{{ collection_stats.total_cards }}</div>
+              <div class="text-[10px] text-zinc-500">{{ collection_stats.unique_cards }} unikalnych</div>
+            </div>
+          </div>
+
+          <a href="/collection" class="mt-4 block text-center px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium rounded-md transition-colors">
+            Zobacz szczegóły
+          </a>
+        </div>
+        {% else %}
+        <!-- Feature Cards -->
+        <div class="space-y-2">
+          <div class="bg-zinc-900/50 border border-zinc-800 rounded-md p-3 hover:bg-zinc-900 transition-colors zinc-card-hover">
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-indigo-500/10 rounded-md flex-shrink-0">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-medium text-zinc-200">Śledź wartość portfela</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">Monitoruj zmiany cen na wykresach i otrzymuj alerty o wzrostach i spadkach</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-zinc-900/50 border border-zinc-800 rounded-md p-3 hover:bg-zinc-900 transition-colors zinc-card-hover">
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-purple-500/10 rounded-md flex-shrink-0">
+                <i data-lucide="database" class="w-4 h-4 text-purple-400"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-medium text-zinc-200">Pełna baza kart</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">Wyszukuj karty po nazwie, numerze i secie oraz dodawaj je jednym kliknięciem</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-zinc-900/50 border border-zinc-800 rounded-md p-3 hover:bg-zinc-900 transition-colors zinc-card-hover">
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-emerald-500/10 rounded-md flex-shrink-0">
+                <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-medium text-zinc-200">Dostęp mobilny</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">Synchronizacja między urządzeniami 24/7 – Twoje dane zawsze pod ręką</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+{% if not username %}
+<section class="py-8 bg-black border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="text-center mb-6">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-white mb-2">Jak to działa?</h2>
+      <p class="text-sm text-zinc-500">Zacznij zarządzać swoją kolekcją w 3 prostych krokach</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-3">
+          <span class="text-lg font-semibold text-indigo-400">1</span>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-200 mb-1">Załóż konto</h3>
+        <p class="text-xs text-zinc-500 leading-relaxed">
+          Rejestracja zajmuje tylko minutę. Wszystkie dane są bezpiecznie przechowywane i szyfrowane.
+        </p>
+      </div>
+
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3">
+          <span class="text-lg font-semibold text-purple-400">2</span>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-200 mb-1">Dodaj karty</h3>
+        <p class="text-xs text-zinc-500 leading-relaxed">
+          Wyszukuj w bazie tysięcy kart i dodawaj je jednym kliknięciem do swojej kolekcji.
+        </p>
+      </div>
+
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
+          <span class="text-lg font-semibold text-emerald-400">3</span>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-200 mb-1">Śledź wartość</h3>
+        <p class="text-xs text-zinc-500 leading-relaxed">
+          Monitoruj wartość kolekcji, trendy cenowe i otrzymuj powiadomienia o zmianach.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Recently Added Section -->
+{% if username and recently_added %}
+<section class="py-8 bg-zinc-950 border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+        <i data-lucide="clock" class="w-4 h-4 text-indigo-400"></i>
+        Ostatnio dodane
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+      {% for item in recently_added %}
+      <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-2 hover:border-zinc-700 transition-all zinc-card-hover">
+        {% if item.image_small %}
+        <div class="aspect-[2.5/3.5] bg-zinc-800 rounded mb-2 overflow-hidden">
+          <img src="{{ item.image_small }}" alt="{{ item.name }}" class="w-full h-full object-cover" />
+        </div>
+        {% endif %}
+        <div class="space-y-1">
+          <h3 class="text-xs font-medium text-zinc-200 line-clamp-2">{{ item.name }}</h3>
+          <p class="text-[10px] text-zinc-500 truncate">{{ item.set_name }}</p>
+          {% if item.price %}
+          <div class="inline-flex items-center px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded text-[10px] font-medium text-emerald-400">
+            {{ "%.2f"|format(item.price) }} PLN
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Price Changes Section -->
+{% if username and price_changes %}
+<section class="py-8 bg-black border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+      Największe zmiany cen w Twojej kolekcji
+    </h2>
+
+    <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="border-b border-zinc-800">
+            <tr>
+              <th class="py-2 px-4 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Karta</th>
+              <th class="py-2 px-4 text-[10px] font-medium text-zinc-500 uppercase tracking-wider text-right">Zmiana 7d</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800/50">
+            {% for item in price_changes %}
+            <tr class="hover:bg-zinc-900/50 transition-colors">
+              <td class="py-2 px-4 text-xs text-zinc-300">{{ item.name }}</td>
+              <td class="py-2 px-4 text-right">
+                {% if item.change_percent > 0 %}
+                <span class="inline-flex items-center px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded text-[10px] font-medium text-emerald-400">
+                  <i data-lucide="arrow-up" class="w-3 h-3 mr-1"></i>
+                  +{{ "%.1f"|format(item.change_percent) }}%
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-medium text-red-400">
+                  <i data-lucide="arrow-down" class="w-3 h-3 mr-1"></i>
+                  {{ "%.1f"|format(item.change_percent) }}%
+                </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Latest Products Section -->
+<section class="py-8 bg-zinc-950 border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <i data-lucide="package" class="w-4 h-4 text-indigo-400"></i>
+      Najnowsze produkty Pokemon TCG
+    </h2>
+
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+      {% for product in latest_products %}
+      <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-2 hover:border-zinc-700 transition-all zinc-card-hover">
+        <div class="aspect-[2.5/3.5] bg-zinc-800 rounded mb-2 overflow-hidden">
+          <img src="{{ product.image_large }}" alt="{{ product.name }}" class="w-full h-full object-cover" />
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-xs font-medium text-zinc-200 line-clamp-2">{{ product.name }}</h3>
+          <div class="flex items-center gap-1 text-[10px] text-zinc-500">
+            <i data-lucide="calendar" class="w-3 h-3"></i>
+            {{ product.release_date }}
+          </div>
+          <div class="inline-flex items-center px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded text-[10px] font-medium text-emerald-400">
+            {{ "%.2f"|format(product.price) }} PLN
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-8 bg-black border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <div class="text-center mb-6">
+      <h2 class="text-xl font-semibold tracking-tight text-white mb-2">Często zadawane pytania</h2>
+      <p class="text-sm text-zinc-500">Znajdź odpowiedzi na najczęściej zadawane pytania</p>
+    </div>
+
+    <div class="space-y-2">
+      <details class="group bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+        <summary class="flex items-center justify-between px-4 py-3 cursor-pointer text-sm font-medium text-zinc-200 hover:bg-zinc-900 transition-colors">
+          <span>Czy aplikacja jest darmowa?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-4 py-3 text-xs text-zinc-400 border-t border-zinc-800 bg-zinc-900/30">
+          Tak! Kartoteka jest całkowicie darmowa. Możesz zarządzać swoją kolekcją bez żadnych opłat.
+        </div>
+      </details>
+
+      <details class="group bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+        <summary class="flex items-center justify-between px-4 py-3 cursor-pointer text-sm font-medium text-zinc-200 hover:bg-zinc-900 transition-colors">
+          <span>Skąd pochodzą ceny kart?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-4 py-3 text-xs text-zinc-400 border-t border-zinc-800 bg-zinc-900/30">
+          Ceny kart są synchronizowane z zewnętrznych API i aktualizowane regularnie, aby zapewnić najdokładniejsze informacje rynkowe.
+        </div>
+      </details>
+
+      <details class="group bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+        <summary class="flex items-center justify-between px-4 py-3 cursor-pointer text-sm font-medium text-zinc-200 hover:bg-zinc-900 transition-colors">
+          <span>Czy moje dane są bezpieczne?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-4 py-3 text-xs text-zinc-400 border-t border-zinc-800 bg-zinc-900/30">
+          Tak! Wszystkie dane są szyfrowane i bezpiecznie przechowywane. Przestrzegamy zasad RODO i dbamy o prywatność użytkowników.
+        </div>
+      </details>
+
+      <details class="group bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+        <summary class="flex items-center justify-between px-4 py-3 cursor-pointer text-sm font-medium text-zinc-200 hover:bg-zinc-900 transition-colors">
+          <span>Czy aplikacja działa na urządzeniach mobilnych?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <div class="px-4 py-3 text-xs text-zinc-400 border-t border-zinc-800 bg-zinc-900/30">
+          Tak! Kartoteka jest w pełni responsywna i działa świetnie na smartfonach i tabletach. Możesz również zainstalować ją jako PWA.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- Legal Section -->
+<section class="py-8 bg-zinc-950">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="text-center mb-6">
+      <h2 class="text-lg font-semibold text-white mb-1">Transparentność i bezpieczeństwo</h2>
+      <p class="text-xs text-zinc-500">Poznaj nasze zasady działania i ochronę danych osobowych</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-3 max-w-4xl mx-auto">
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <h3 class="text-sm font-semibold text-zinc-200 flex items-center gap-2 mb-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i>
+          Regulamin serwisu
+        </h3>
+        <p class="text-xs text-zinc-500 mb-3 leading-relaxed">
+          Dowiedz się, jakie obowiązki mają użytkownicy i jakie wsparcie zapewnia zespół Kartoteki.
+        </p>
+        <a href="/terms" class="inline-block px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium rounded-md transition-colors">
+          Przeczytaj regulamin
+        </a>
+      </div>
+
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <h3 class="text-sm font-semibold text-zinc-200 flex items-center gap-2 mb-2">
+          <i data-lucide="shield" class="w-4 h-4 text-purple-400"></i>
+          Polityka prywatności
+        </h3>
+        <p class="text-xs text-zinc-500 mb-3 leading-relaxed">
+          Sprawdź, jakie dane gromadzimy oraz w jaki sposób możesz nimi zarządzać zgodnie z RODO.
+        </p>
+        <a href="/privacy" class="inline-block px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium rounded-md transition-colors">
+          Polityka prywatności
+        </a>
+      </div>
+
+      <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
+        <h3 class="text-sm font-semibold text-zinc-200 flex items-center gap-2 mb-2">
+          <i data-lucide="cookie" class="w-4 h-4 text-emerald-400"></i>
+          Polityka cookies
+        </h3>
+        <p class="text-xs text-zinc-500 mb-3 leading-relaxed">
+          Poznaj rodzaje wykorzystywanych plików cookies i dowiedz się, jak wycofać zgodę.
+        </p>
+        <a href="/cookies" class="inline-block px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium rounded-md transition-colors">
+          Zarządzaj cookies
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Initialize Lucide Icons -->
+<script>
+  lucide.createIcons();
+</script>
+
+{% endblock %}

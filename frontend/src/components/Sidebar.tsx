@@ -14,6 +14,7 @@ const items: Item[] = [
   { key: 'reports', label: 'Statystyki', icon: 'analytics', color: 'purple' },
   { key: 'pricing', label: 'Wycena', icon: 'sell', color: 'emerald' },
   { key: 'bidding', label: 'Licytacje', icon: 'gavel', color: 'amber' },
+  { key: 'app_dashboard', label: 'Collector', icon: 'collections_bookmark', color: 'rose' },
   { key: 'orders', label: 'Zamówienia', icon: 'receipt_long', color: 'blue' },
 ]
 

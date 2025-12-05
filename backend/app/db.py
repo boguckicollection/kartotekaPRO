@@ -384,6 +384,93 @@ class FurgonetkaShipment(Base):
     response_payload = Column(Text, nullable=True)  # JSON
 
 
+# ========== AUCTIONS & BIDS (Integration with Kartoteka App) ==========
+
+class KartotekaUser(Base):
+    """
+    Cache table for users from Kartoteka App (port 8001).
+    Used for auction bids and winner tracking.
+    Synced from kartoteka.db via API.
+    """
+    __tablename__ = "kartoteka_users"
+    id = Column(Integer, primary_key=True, index=True)
+    kartoteka_user_id = Column(Integer, unique=True, nullable=False, index=True)  # ID from kartoteka.db
+    username = Column(String(255), nullable=False, index=True)
+    email = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    synced_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class Auction(Base):
+    """
+    Auction for Pokemon cards or sealed products.
+    Managed from admin panel, visible in Kartoteka App.
+    """
+    __tablename__ = "auctions"
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # Link to existing product in shop (if already in Shoper)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=True, index=True)
+    
+    # Or link to catalog entry
+    catalog_id = Column(Integer, ForeignKey("card_catalog.id"), nullable=True, index=True)
+    
+    # Auction details
+    title = Column(String(255), nullable=False, index=True)
+    description = Column(Text, nullable=True)
+    image_url = Column(Text, nullable=True)
+    
+    # Pricing
+    start_price = Column(Float, nullable=False)
+    current_price = Column(Float, nullable=False)
+    min_increment = Column(Float, default=1.0, nullable=False)
+    buyout_price = Column(Float, nullable=True)  # Optional instant buy price
+    
+    # Timing
+    start_time = Column(DateTime, nullable=False, index=True)
+    end_time = Column(DateTime, nullable=False, index=True)
+    
+    # Status: draft, active, ended, cancelled, sold
+    status = Column(String(32), default="draft", nullable=False, index=True)
+    
+    # Winner (from Kartoteka App users)
+    winner_kartoteka_user_id = Column(Integer, nullable=True)
+    
+    # Shoper integration
+    auto_publish_to_shoper = Column(Boolean, default=False, nullable=False)
+    published_shoper_id = Column(Integer, nullable=True)
+    
+    # Metadata
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    ended_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    product = relationship("Product", foreign_keys=[product_id])
+    catalog = relationship("CardCatalog", foreign_keys=[catalog_id])
+    bids = relationship("AuctionBid", back_populates="auction", cascade="all, delete-orphan")
+
+
+class AuctionBid(Base):
+    """
+    Bid placed on an auction by a Kartoteka App user.
+    """
+    __tablename__ = "auction_bids"
+    id = Column(Integer, primary_key=True, index=True)
+    
+    auction_id = Column(Integer, ForeignKey("auctions.id", ondelete="CASCADE"), nullable=False, index=True)
+    kartoteka_user_id = Column(Integer, nullable=False, index=True)  # ID from kartoteka.db
+    
+    amount = Column(Float, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    
+    # User info snapshot (for display if Kartoteka App is offline)
+    username = Column(String(255), nullable=True)
+    
+    # Relationships
+    auction = relationship("Auction", back_populates="bids")
+
+
 def init_db():
     Base.metadata.create_all(bind=engine)
     # Best-effort lightweight migration for SQLite
@@ -462,6 +549,14 @@ def init_db():
         ],
         "inventory": [
             ("purchase_price", "FLOAT"),
+        ],
+        "auctions": [
+            ("product_id", "INTEGER"),
+            ("catalog_id", "INTEGER"),
+            ("buyout_price", "FLOAT"),
+            ("auto_publish_to_shoper", "INTEGER DEFAULT 0"),
+            ("published_shoper_id", "INTEGER"),
+            ("ended_at", "DATETIME"),
         ],
     }
 

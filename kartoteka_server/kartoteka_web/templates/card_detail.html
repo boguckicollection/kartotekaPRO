@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block title %}{{ card_name or 'Szczegóły karty' }} - Kartoteka{% endblock %}
+{% block head_extra %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" crossorigin="anonymous"></script>
+  <style>
+    /* Zinc Detail Styles */
+    .card-detail-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    
+    @media (min-width: 1024px) {
+      .card-detail-layout {
+        grid-template-columns: 340px 1fr;
+      }
+    }
+
+    .zinc-card-wrapper {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 3/4;
+      position: relative;
+    }
+
+    .zinc-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .zinc-meta-item {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .zinc-meta-label {
+      font-size: 10px;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .zinc-meta-value {
+      font-size: 13px;
+      color: #fafafa;
+      font-weight: 500;
+    }
+
+    .zinc-price-display {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .zinc-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .zinc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #27272a;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #d4d4d8;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<section
+  class="bg-zinc-950 border-b border-zinc-800 py-8"
+  id="card-detail-page"
+  data-name="{{ card_name | default('') }}"
+  data-number="{{ card_number | default('') }}"
+  data-set-code="{{ card_set_code | default('') }}"
+  data-set-name="{{ card_set_name | default('') }}"
+  data-total="{{ card_total | default('') }}"
+>
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="card-detail-layout">
+      
+      <!-- Left Column: Card Image -->
+      <div class="flex flex-col gap-4">
+        <div class="zinc-card-wrapper">
+          <div class="card interactive w-full h-full" id="pokemon-card">
+            <div class="card__translater">
+              <div class="card__rotator" id="card-rotator">
+                <div class="card__front">
+                  <img
+                    id="card-detail-image"
+                    alt="Podgląd karty {{ card_name or '' }}"
+                    loading="lazy"
+                    class="w-full h-full object-contain rounded-lg"
+                    hidden
+                  />
+                  <div class="card__shine"></div>
+                  <div class="card__glare"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-detail-placeholder text-4xl text-zinc-700" id="card-detail-placeholder">🃏</div>
+        </div>
+        
+        <div class="flex justify-center gap-2">
+            <div class="zinc-tag">
+                <img id="card-detail-set-icon" class="w-4 h-4 object-contain" hidden data-card-set-icon />
+                <span id="card-detail-set-code" class="uppercase font-bold text-[10px]"></span>
+            </div>
+            <div class="zinc-tag">
+                <img id="card-detail-rarity-icon" class="w-4 h-4 object-contain" hidden data-card-rarity-icon />
+                <span id="card-detail-rarity-fallback" class="font-bold text-[10px]" hidden></span>
+            </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Info & Stats -->
+      <div>
+        <div class="mb-6">
+          <p class="text-xs text-zinc-500 uppercase tracking-wider mb-1" id="card-detail-era" hidden></p>
+          <h1 class="text-3xl font-bold text-white mb-2" id="card-detail-title">{{ card_name or 'Szczegóły karty' }}</h1>
+          <p class="text-sm text-indigo-400 font-medium" id="card-detail-set-name">{{ card_set_name or '' }}</p>
+          <p class="text-xs text-zinc-500 mt-1" id="card-detail-artist" hidden></p>
+        </div>
+
+        <div id="card-detail-price-container" hidden>
+          <div class="zinc-price-display" id="card-detail-price"></div>
+        </div>
+
+        <div class="zinc-meta-grid">
+          <div class="zinc-meta-item">
+            <div class="zinc-meta-label">Numer</div>
+            <div class="zinc-meta-value" id="card-detail-number">{{ card_number or '' }}</div>
+          </div>
+          <div class="zinc-meta-item">
+            <div class="zinc-meta-label">Rzadkość</div>
+            <div class="zinc-meta-value" id="card-detail-rarity">-</div>
+          </div>
+          <div class="zinc-meta-item">
+            <div class="zinc-meta-label">Nakład</div>
+            <div class="zinc-meta-value" id="card-detail-total">-</div>
+          </div>
+          <div class="zinc-meta-item">
+            <div class="zinc-meta-label">Data wydania</div>
+            <div class="zinc-meta-value" id="card-detail-release">-</div>
+          </div>
+        </div>
+
+        <div class="zinc-actions">
+          <button type="button" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-md text-sm font-medium transition-colors flex-1" id="detail-add-button">
+            Dodaj do kolekcji
+          </button>
+          <a href="https://kartoteka.shop" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-md text-sm font-medium transition-colors flex-1 text-center" id="detail-buy-button" target="_blank" rel="noopener">
+            Kup na kartoteka.shop
+          </a>
+        </div>
+        
+        <div class="alert bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg mt-4 text-sm" id="card-detail-alert" hidden></div>
+
+        <!-- Description Section -->
+        <div class="mt-8 pt-8 border-t border-zinc-800" id="card-detail-description-section" hidden>
+            <h3 class="text-sm font-semibold text-zinc-300 mb-3">Opis karty</h3>
+            <p class="text-xs text-zinc-500 mb-3" id="card-detail-description-meta" hidden></p>
+            <div class="text-sm text-zinc-400 leading-relaxed space-y-2" id="card-detail-description"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- History Section -->
+<section class="bg-black border-b border-zinc-800 py-8" id="card-price-history-section" hidden>
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+          <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+          Historia cen
+        </h2>
+        <p class="text-xs text-zinc-500 mt-1">Zmiana wartości w czasie</p>
+      </div>
+      
+      <div class="flex bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+        <button type="button" class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors" data-price-range="last_7">7d</button>
+        <button type="button" class="px-3 py-1 text-xs font-medium text-zinc-900 bg-white rounded shadow-sm" data-price-range="last_30">30d</button>
+        <button type="button" class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors" data-price-range="all">All</button>
+      </div>
+    </div>
+    
+    <div class="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 h-[300px] relative">
+      <canvas id="card-price-chart"></canvas>
+      <p class="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm" id="card-price-chart-empty" hidden>Brak danych do wyświetlenia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Related Cards -->
+<section class="bg-zinc-950 py-8">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i>
+        Polecane karty z tą postacią
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="related-cards-list"></div>
+    <p class="text-center text-zinc-500 text-sm py-8" id="related-empty" hidden>Nie znaleziono innych kart.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    
+    const card = document.getElementById('pokemon-card');
+    const rotator = document.getElementById('card-rotator');
+    if (!card || !rotator) return;
+
+    let interacting = false;
+    let animationFrame;
+
+    const clamp = (value, min = 0, max = 100) => Math.min(Math.max(value, min), max);
+    const round = (value, precision = 3) => parseFloat(value.toFixed(precision));
+    const adjust = (value, fromMin, fromMax, toMin, toMax) => round(toMin + (toMax - toMin) * (value - fromMin) / (fromMax - fromMin));
+
+    const interact = (e) => {
+      interacting = true;
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => updateCard(e));
+    };
+
+    const interactEnd = () => {
+      interacting = false;
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(resetCard);
+    };
+
+    const updateCard = (e) => {
+      const rect = rotator.getBoundingClientRect();
+      const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+      const absolute = {
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+      };
+      const percent = {
+        x: clamp(round((100 / rect.width) * absolute.x)),
+        y: clamp(round((100 / rect.height) * absolute.y)),
+      };
+      const center = {
+        x: percent.x - 50,
+        y: percent.y - 50,
+      };
+
+      const background = {
+          x: adjust(percent.x, 0, 100, 37, 63),
+          y: adjust(percent.y, 0, 100, 33, 67),
+      };
+      const rotate = {
+          x: round(-(center.x / 3.5)),
+          y: round(center.y / 2),
+      };
+      const glare = {
+          x: round(percent.x),
+          y: round(percent.y),
+      };
+      
+      const pointerFromCenter = clamp(
+        Math.sqrt(center.x * center.x + center.y * center.y) / 50,
+        0, 1
+      );
+
+      card.style.setProperty('--pointer-x', `${glare.x}%`);
+      card.style.setProperty('--pointer-y', `${glare.y}%`);
+      card.style.setProperty('--background-x', `${background.x}%`);
+      card.style.setProperty('--background-y', `${background.y}%`);
+      card.style.setProperty('--rotate-x', `${rotate.x}deg`);
+      card.style.setProperty('--rotate-y', `${rotate.y}deg`);
+      card.style.setProperty('--card-opacity', '1');
+      card.style.setProperty('--pointer-from-center', `${round(pointerFromCenter)}`);
+      card.style.setProperty('--pointer-from-top', `${round(percent.y / 100)}`);
+      card.style.setProperty('--pointer-from-left', `${round(percent.x / 100)}`);
+    };
+
+    const resetCard = () => {
+      card.style.setProperty('--rotate-x', `0deg`);
+      card.style.setProperty('--rotate-y', `0deg`);
+      card.style.setProperty('--card-opacity', '0');
+    };
+
+    rotator.addEventListener('pointermove', interact);
+    rotator.addEventListener('pointerenter', () => card.classList.add('interacting'));
+    rotator.addEventListener('pointerleave', interactEnd);
+  });
+</script>
+{% endblock %}

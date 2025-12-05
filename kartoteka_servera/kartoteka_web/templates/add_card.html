@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Dodaj kartę - Kartoteka{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Zinc Search Styles */
+.search-hero {
+  background: #09090b;
+  border-bottom: 1px solid #27272a;
+  padding: 64px 24px; /* Increased padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content */
+  justify-content: center;
+  text-align: center;
+}
+
+.search-panel {
+  background: #000000;
+  padding: 32px 0;
+  min-height: calc(100vh - 200px);
+}
+
+/* New Segmented Control Switcher */
+.segmented-control {
+  display: inline-flex;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.segmented-control-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #a1a1aa;
+  transition: color 0.3s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.segmented-control-btn.is-active {
+  color: #fafafa;
+}
+
+.segmented-control-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  background: #3f3f46;
+  border-radius: 6px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.zinc-input-lg {
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #fafafa;
+  border-radius: 8px;
+  padding: 16px 24px 16px 56px; /* Increased padding */
+  font-size: 18px; /* Larger font */
+  width: 100%;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.zinc-input-lg:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.search-icon-lg {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #71717a;
+  width: 24px;
+  height: 24px;
+}
+
+/* Larger, more spaced out cards */
+.card-search-results--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Larger min-width */
+  gap: 24px; /* Increased gap */
+  margin-top: 24px;
+}
+
+/* Pagination Styles */
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #a1a1aa;
+  transition: all 0.2s;
+}
+.pagination-btn:hover {
+  background: #27272a;
+  color: #fafafa;
+}
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pagination-info {
+  font-size: 13px;
+  color: #71717a;
+  padding: 8px 12px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div
+  class="alert bg-zinc-900 border border-zinc-800 text-white p-4 rounded-lg shadow-lg fixed top-4 right-4 z-50 max-w-md"
+  id="add-card-alert"
+  hidden
+  role="status"
+  aria-live="polite"
+></div>
+
+<!-- Hero & Search Input -->
+<section class="search-hero">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <h1 class="text-4xl font-bold text-white tracking-tight mb-3">Wyszukaj w Bazie Danych</h1>
+    <p class="text-zinc-400 mb-8 text-lg">Znajdź karty i produkty, aby dodać je do swojej kolekcji.</p>
+
+    <form id="add-card-form" class="add-card-form" autocomplete="off" data-card-search-form>
+      <div class="segmented-control">
+        <div class="segmented-control-indicator"></div>
+        <button type="button" class="segmented-control-btn is-active" data-search-type="card">
+          <i data-lucide="credit-card" class="w-4 h-4 mr-2"></i>
+          Karty
+        </button>
+        <button type="button" class="segmented-control-btn" data-search-type="product">
+          <i data-lucide="package" class="w-4 h-4 mr-2"></i>
+          Produkty
+        </button>
+        <input type="hidden" name="type" id="search-type" value="card">
+      </div>
+
+      <div class="relative">
+        <i data-lucide="search" class="search-icon-lg"></i>
+        <input
+          type="text"
+          name="query"
+          id="add-card-query"
+          autocomplete="off"
+          placeholder="Wpisz nazwę, np. Charizard, Pikachu..."
+          required
+          class="zinc-input-lg"
+        />
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Results Panel -->
+<section class="search-panel" id="add-card-page">
+  <div class="container mx-auto px-4 max-w-7xl">
+    
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-zinc-800 pb-4" data-card-search-toolbar>
+      <p id="card-search-summary" class="text-sm text-zinc-500" hidden aria-live="polite"></p>
+      <div class="flex items-center gap-4 ml-auto">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-zinc-500">Sortuj:</span>
+          <select id="card-sort-select" data-card-sort class="bg-zinc-900 border border-zinc-800 rounded-md py-1 px-2 text-xs text-zinc-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+            <option value="relevance">Domyślne</option>
+            <option value="name-asc">Nazwa (A–Z)</option>
+            <option value="name-desc">Nazwa (Z–A)</option>
+            <option value="set-asc">Dodatek (A–Z)</option>
+            <option value="number-asc">Numer rosnąco</option>
+            <option value="number-desc">Numer malejąco</option>
+            <option value="price-asc">Cena rosnąco</option>
+            <option value="price-desc">Cena malejąco</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-zinc-500">Widok:</span>
+          <div class="flex bg-zinc-900 p-1 rounded-md border border-zinc-800">
+            <button type="button" data-card-view="grid" aria-pressed="true" class="p-1 rounded bg-zinc-700 text-white">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            </button>
+            <button type="button" data-card-view="list" aria-pressed="false" class="p-1 rounded text-zinc-500 hover:text-zinc-200">
+              <i data-lucide="list" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div
+      id="card-search-results"
+      class="card-search-results card-search-results--grid"
+      role="list"
+      data-view-mode="grid"
+    ></div>
+
+    <!-- Pagination -->
+    <nav
+      id="card-search-pagination"
+      class="flex justify-center items-center gap-4 mt-12"
+      hidden
+      aria-label="Stronicowanie wyników wyszukiwania"
+    ></nav>
+
+    <!-- Empty State -->
+    <p id="card-search-empty" class="text-center py-16 text-zinc-500 text-base" hidden aria-live="polite">Brak wyników. Spróbuj wpisać inną frazę.</p>
+  </div>
+</section>
+
+<!-- Init Icons & Auto Search -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    
+    // Segmented Control Logic
+    const typeSwitchButtons = document.querySelectorAll('[data-search-type]');
+    const searchTypeInput = document.getElementById('search-type');
+    const indicator = document.querySelector('.segmented-control-indicator');
+
+    typeSwitchButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        // Update UI
+        typeSwitchButtons.forEach(btn => btn.classList.remove('is-active'));
+        button.classList.add('is-active');
+        
+        // Move indicator
+        if (indicator) {
+          indicator.style.transform = `translateX(${index * 100}%)`;
+        }
+        
+        // Update hidden input
+        const type = button.dataset.searchType;
+        if (searchTypeInput) {
+          searchTypeInput.value = type;
+        }
+        
+        // Trigger search
+        const input = document.getElementById('add-card-query');
+        if (input && input.value.trim()) {
+          const form = document.getElementById('add-card-form');
+          if (form) form.dispatchEvent(new Event('submit'));
+        }
+      });
+    });
+
+    // Auto-search if query param present
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('query');
+    if (query) {
+        const input = document.getElementById('add-card-query');
+        const form = document.getElementById('add-card-form');
+        if (input && form) {
+            input.value = query;
+            setTimeout(() => {
+                form.dispatchEvent(new Event('submit'));
+            }, 100);
+        }
+    }
+  });
+</script>
+{% endblock %}

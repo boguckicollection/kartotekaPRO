@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: kartoteka_postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=kartoteka
+      - POSTGRES_PASSWORD=kartoteka_password
+      - POSTGRES_DB=kartoteka_db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: kartoteka_servera-app-1
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      - KARTOTEKA_DATABASE_URL=postgresql://kartoteka:kartoteka_password@db/kartoteka_db
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    env_file:
+      - .env
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: ["http", "app:8000", "--log=stdout"]
+    ports:
+      - "4040:4040"
+    links:
+      - app
+
+volumes:
+  postgres_data:
+    driver: local

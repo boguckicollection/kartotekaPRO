@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% block title %}Dodaj kartę - Kartoteka{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Zinc Search Styles */
+.search-hero {
+  background: radial-gradient(circle at top center, #18181b 0%, #09090b 100%);
+  border-bottom: 1px solid #27272a;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.search-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  background: url("{{ url_for('static', path='/img/grid.svg') }}") center top no-repeat; /* Optional grid pattern if available */
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.search-panel {
+  background: #000000;
+  padding: 40px 0;
+  min-height: calc(100vh - 300px);
+}
+
+/* Segmented Control */
+.segmented-control {
+  display: inline-flex;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 9999px; /* Pill shape */
+  padding: 4px;
+  margin-bottom: 32px;
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.segmented-control-btn {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #a1a1aa;
+  transition: color 0.2s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.segmented-control-btn:hover {
+  color: #d4d4d8;
+}
+
+.segmented-control-btn.is-active {
+  color: #ffffff;
+}
+
+.segmented-control-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px); /* Assuming 2 buttons */
+  background: #3f3f46;
+  border-radius: 9999px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Search Input */
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.zinc-input-lg {
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #fafafa;
+  border-radius: 16px;
+  padding: 20px 60px 20px 24px; /* Icon on the right */
+  font-size: 18px;
+  line-height: 1.5;
+  width: 100%;
+  transition: all 0.2s ease;
+  outline: none;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.zinc-input-lg:focus {
+  border-color: #6366f1;
+  background: #27272a;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.zinc-input-lg::placeholder {
+  color: #52525b;
+}
+
+.search-icon-lg {
+  position: absolute;
+  right: 24px; /* Moved to right */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #71717a;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.zinc-input-lg:focus + .search-icon-lg {
+  color: #6366f1;
+}
+
+/* Results Grid */
+.card-search-results--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+/* Pagination */
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #a1a1aa;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.pagination-btn:hover:not(:disabled) {
+  background: #27272a;
+  color: #fafafa;
+  border-color: #3f3f46;
+}
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pagination-info {
+  font-size: 14px;
+  color: #71717a;
+  padding: 8px 16px;
+  font-variant-numeric: tabular-nums;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div
+  class="alert bg-zinc-900 border border-zinc-800 text-white p-4 rounded-lg shadow-lg fixed top-4 right-4 z-50 max-w-md"
+  id="add-card-alert"
+  hidden
+  role="status"
+  aria-live="polite"
+></div>
+
+<!-- Hero & Search Input -->
+<section class="search-hero">
+  <div class="container mx-auto px-4 max-w-3xl">
+    <div class="inline-flex items-center px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-xs font-medium text-indigo-400 mb-6">
+      <i data-lucide="database" class="w-3 h-3 mr-1.5"></i>
+      Globalna Baza Kart
+    </div>
+    
+    <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Znajdź i dodaj karty</h1>
+    <p class="text-zinc-400 mb-10 text-lg max-w-xl mx-auto leading-relaxed">
+      Przeszukuj tysiące kart i produktów Pokemon TCG. Dodawaj je do swojej kolekcji jednym kliknięciem.
+    </p>
+
+    <form id="add-card-form" class="w-full flex flex-col items-center" autocomplete="off" data-card-search-form>
+      <!-- Segmented Control -->
+      <div class="segmented-control">
+        <div class="segmented-control-indicator"></div>
+        <button type="button" class="segmented-control-btn is-active" data-search-type="card">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          Karty
+        </button>
+        <button type="button" class="segmented-control-btn" data-search-type="product">
+          <i data-lucide="package" class="w-4 h-4"></i>
+          Produkty
+        </button>
+        <input type="hidden" name="type" id="search-type" value="card">
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          name="query"
+          id="add-card-query"
+          autocomplete="off"
+          placeholder="Wpisz nazwę karty (np. Charizard, Pikachu)..."
+          required
+          class="zinc-input-lg"
+        />
+        <i data-lucide="search" class="search-icon-lg"></i>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Results Panel -->
+<section class="search-panel" id="add-card-page">
+  <div class="container mx-auto px-4 max-w-7xl">
+    
+    <!-- Toolbar -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 border-b border-zinc-800 pb-6" data-card-search-toolbar>
+      <div class="flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+        <p id="card-search-summary" class="text-sm text-zinc-400 font-medium" aria-live="polite">Gotowy do wyszukiwania</p>
+      </div>
+      
+      <div class="flex items-center gap-4 w-full md:w-auto justify-end">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-zinc-500 font-medium uppercase tracking-wider">Sortowanie</span>
+          <select id="card-sort-select" data-card-sort class="bg-zinc-900 border border-zinc-800 rounded-lg py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-shadow cursor-pointer hover:border-zinc-700">
+            <option value="relevance">Trafność</option>
+            <option value="name-asc">Nazwa (A–Z)</option>
+            <option value="name-desc">Nazwa (Z–A)</option>
+            <option value="set-asc">Dodatek (A–Z)</option>
+            <option value="number-asc">Numer (rosnąco)</option>
+            <option value="number-desc">Numer (malejąco)</option>
+            <option value="price-asc">Cena (rosnąco)</option>
+            <option value="price-desc">Cena (malejąco)</option>
+          </select>
+        </div>
+        
+        <div class="h-6 w-px bg-zinc-800 hidden md:block"></div>
+        
+        <div class="flex bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+          <button type="button" data-card-view="grid" aria-pressed="true" class="p-1.5 rounded-md bg-zinc-700 text-white shadow-sm transition-all" aria-label="Widok siatki">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+          </button>
+          <button type="button" data-card-view="list" aria-pressed="false" class="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-all" aria-label="Widok listy">
+            <i data-lucide="list" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div
+      id="card-search-results"
+      class="card-search-results card-search-results--grid"
+      role="list"
+      data-view-mode="grid"
+    >
+      <!-- Empty State Initial -->
+      <div class="col-span-full flex flex-col items-center justify-center py-20 text-zinc-600">
+        <i data-lucide="search" class="w-16 h-16 mb-4 opacity-20"></i>
+        <p class="text-lg font-medium">Wpisz frazę powyżej, aby rozpocząć wyszukiwanie</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav
+      id="card-search-pagination"
+      class="flex justify-center items-center gap-4 mt-16"
+      hidden
+      aria-label="Stronicowanie wyników"
+    ></nav>
+
+    <!-- Empty State (No Results) -->
+    <div id="card-search-empty" class="hidden flex-col items-center justify-center py-24 text-center">
+      <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-zinc-800">
+        <i data-lucide="search-x" class="w-10 h-10 text-zinc-600"></i>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-2">Brak wyników</h3>
+      <p class="text-zinc-500 max-w-sm mx-auto">Nie znaleźliśmy nic pasującego do Twojego zapytania. Spróbuj zmienić filtry lub wpisz inną frazę.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Init Icons & Auto Search -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    
+    // Segmented Control Logic
+    const typeSwitchButtons = document.querySelectorAll('[data-search-type]');
+    const searchTypeInput = document.getElementById('search-type');
+    const indicator = document.querySelector('.segmented-control-indicator');
+    const input = document.getElementById('add-card-query');
+
+    function updateIndicator(index) {
+        if (indicator) {
+            indicator.style.transform = `translateX(${index * 100}%)`;
+        }
+    }
+
+    typeSwitchButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        // Update UI
+        typeSwitchButtons.forEach(btn => btn.classList.remove('is-active'));
+        button.classList.add('is-active');
+        
+        updateIndicator(index);
+        
+        // Update hidden input
+        const type = button.dataset.searchType;
+        if (searchTypeInput) {
+          searchTypeInput.value = type;
+        }
+        
+        // Update placeholder
+        if (input) {
+            input.placeholder = type === 'product' 
+                ? "Wpisz nazwę produktu (np. Elite Trainer Box)..." 
+                : "Wpisz nazwę karty (np. Charizard, Pikachu)...";
+        }
+        
+        // Trigger search if value exists
+        if (input && input.value.trim()) {
+          const form = document.getElementById('add-card-form');
+          if (form) form.dispatchEvent(new Event('submit'));
+        }
+      });
+    });
+
+    // Auto-search if query param present
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('query');
+    if (query && input) {
+        input.value = query;
+        const form = document.getElementById('add-card-form');
+        if (form) {
+            // Wait slightly for app.js to initialize listeners
+            setTimeout(() => {
+                form.dispatchEvent(new Event('submit'));
+            }, 300);
+        }
+    }
+  });
+</script>
+{% endblock %}

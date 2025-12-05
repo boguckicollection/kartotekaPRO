@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY tcg_sets.json /app/tcg_sets.json
+COPY data/tcg_sets.json /app/tcg_sets.json
 COPY set_logos /app/set_logos
 COPY backend /app
 

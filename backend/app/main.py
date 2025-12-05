@@ -33,6 +33,8 @@ from .warehouse import get_storage_summary, get_next_free_location, NoFreeLocati
 from pywebpush import webpush, WebPushException
 import asyncio
 import re
+# Import auction routes
+from .auction_routes import router as auction_router
 
 
 def _get_or_create_catalog_entry(
@@ -278,6 +280,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# Register auction router
+app.include_router(auction_router)
 # Serve uploaded files (for detail view)
 try:
     app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
@@ -952,6 +957,13 @@ async def _on_startup():
     # Start price auto-update background task
     if getattr(settings, 'price_auto_update_enabled', False):
         asyncio.create_task(_auto_update_prices_task())
+    
+    # Start auction scheduler background task
+    try:
+        from .auction_scheduler import auction_scheduler_task
+        asyncio.create_task(auction_scheduler_task())
+    except Exception as e:
+        print(f"❌ Failed to start auction scheduler: {e}")
     
     # Migrate purchase_price for existing products
     _migrate_purchase_prices()

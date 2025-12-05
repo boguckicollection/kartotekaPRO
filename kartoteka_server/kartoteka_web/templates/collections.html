@@ -1,0 +1,569 @@
+{% extends "base.html" %}
+
+{% block title %}Moje Kolekcje - Kartoteka{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Chart Gradient */
+.chart-gradient {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 100%);
+}
+
+.stat-value-large {
+    font-size: 3rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+}
+
+@media (min-width: 768px) {
+    .stat-value-large {
+        font-size: 3.75rem;
+    }
+}
+
+/* Collection Card Styles */
+.collection-card {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.collection-card:hover {
+  border-color: #3f3f46;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.collection-cover {
+  aspect-ratio: 16/9;
+  background: #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.collection-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+.collection-icon {
+  font-size: 48px;
+  z-index: 10;
+  text-shadow: 0 4px 6px rgba(0,0,0,0.5);
+}
+
+.collection-info {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-type-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a1a1aa;
+  background: #27272a;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.collection-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fafafa;
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.collection-subtitle {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin: 0 0 12px;
+}
+
+.collection-progress {
+  margin-top: auto;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #27272a;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  transition: width 0.5s ease-out;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: #71717a;
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Portfolio Value Section (Inspired by Template) -->
+    <section class="mb-12 relative">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+            <div>
+                <h2 class="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    Wartość Portfolio
+                </h2>
+                <div class="flex items-baseline gap-4">
+                    <span class="stat-value-large text-white" id="total-portfolio-value">0.00 PLN</span>
+                    <div class="flex items-center text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full text-sm font-medium border border-emerald-400/20">
+                        <i data-lucide="trending-up" class="w-4 h-4 mr-1.5"></i>
+                        <span id="portfolio-change-percent">0.0%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800 self-start md:self-end shadow-sm">
+                <button class="px-4 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-lg">1D</button>
+                <button class="px-4 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-lg">1W</button>
+                <button class="px-4 py-1.5 text-xs font-medium text-zinc-900 bg-white rounded-lg shadow-sm">1M</button>
+                <button class="px-4 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-lg">3M</button>
+                <button class="px-4 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-lg">1Y</button>
+            </div>
+        </div>
+
+        <!-- SVG Chart Area (Visual Only for now) -->
+        <div class="w-full h-72 relative border-b border-zinc-800 bg-zinc-950/50 rounded-t-2xl overflow-hidden">
+            <!-- Grid Lines -->
+            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30">
+                <div class="w-full h-px bg-zinc-800/50 border-t border-dashed border-zinc-700"></div>
+                <div class="w-full h-px bg-zinc-800/50 border-t border-dashed border-zinc-700"></div>
+                <div class="w-full h-px bg-zinc-800/50 border-t border-dashed border-zinc-700"></div>
+                <div class="w-full h-px bg-zinc-800/50 border-t border-dashed border-zinc-700"></div>
+                <div class="w-full h-px bg-zinc-800/50 border-t border-dashed border-zinc-700"></div>
+            </div>
+            
+            <!-- Graph -->
+            <svg class="w-full h-full overflow-visible chart-gradient" preserveAspectRatio="none" viewBox="0 0 1000 200">
+                <defs>
+                    <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.25"></stop>
+                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0"></stop>
+                    </linearGradient>
+                </defs>
+                <path d="M0,150 Q100,140 200,100 T400,120 T600,60 T800,80 T1000,20 V200 H0 Z" fill="url(#gradient)"></path>
+                <path d="M0,150 Q100,140 200,100 T400,120 T600,60 T800,80 T1000,20" fill="none" stroke="#6366f1" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round"></path>
+                
+                <!-- Interactive Point -->
+                <circle cx="1000" cy="20" r="6" fill="#818cf8" stroke="white" stroke-width="3" class="drop-shadow-lg"></circle>
+            </svg>
+        </div>
+    </section>
+
+    <!-- My Collections Grid -->
+    <section>
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i data-lucide="folder-open" class="w-5 h-5 text-yellow-400"></i>
+                    Moje Kolekcje
+                </h2>
+                <p class="text-sm text-zinc-400 mt-1">Zarządzaj swoimi folderami i setami</p>
+            </div>
+            <button type="button" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-indigo-900/20 active:scale-[0.98]" id="new-collection-btn">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Nowa Kolekcja
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="collections-grid">
+            <!-- Collections will be loaded here -->
+        </div>
+        
+        <div class="text-center py-20 bg-zinc-900/30 border border-zinc-800 rounded-2xl" id="empty-state" hidden>
+            <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-800">
+                <i data-lucide="folder-plus" class="w-8 h-8 text-zinc-600"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Brak kolekcji</h3>
+            <p class="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">Utwórz swoją pierwszą kolekcję, aby rozpocząć organizowanie kart.</p>
+            <button type="button" class="px-6 py-2 bg-zinc-100 hover:bg-white text-zinc-900 text-sm font-medium rounded-lg transition-colors" id="empty-new-collection-btn">
+                Utwórz kolekcję
+            </button>
+        </div>
+        
+        <div class="flex flex-col items-center justify-center py-20" id="loading-state">
+            <div class="loading loading-spinner loading-lg text-indigo-500 mb-4"></div>
+            <p class="text-zinc-500 text-sm animate-pulse">Ładowanie kolekcji...</p>
+        </div>
+    </section>
+</div>
+
+<!-- New Collection Modal (Keep existing structure but style it Zinc) -->
+<div class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" id="new-collection-modal" aria-hidden="true">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl transform transition-all">
+    <div class="flex justify-between items-center p-5 border-b border-zinc-800">
+      <h2 class="text-lg font-bold text-white">Nowa Kolekcja</h2>
+      <button type="button" class="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors" data-close-modal>
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    
+    <div class="p-6">
+      <form id="new-collection-form" class="space-y-5">
+        <div class="space-y-3">
+          <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Typ kolekcji</label>
+          <div class="grid grid-cols-1 gap-2">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-indigo-500/50 cursor-pointer transition-colors group has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-500/5">
+              <input type="radio" name="collection_type" value="custom" checked class="w-4 h-4 text-indigo-600 border-zinc-700 focus:ring-indigo-500 bg-zinc-900">
+              <div class="flex-1">
+                <div class="font-medium text-white text-sm group-hover:text-indigo-300">Własna kolekcja</div>
+                <div class="text-xs text-zinc-500">Dodawaj dowolne karty ręcznie</div>
+              </div>
+              <i data-lucide="star" class="w-4 h-4 text-zinc-600 group-has-[:checked]:text-indigo-500"></i>
+            </label>
+            
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-purple-500/50 cursor-pointer transition-colors group has-[:checked]:border-purple-500 has-[:checked]:bg-purple-500/5">
+              <input type="radio" name="collection_type" value="set" class="w-4 h-4 text-purple-600 border-zinc-700 focus:ring-purple-500 bg-zinc-900">
+              <div class="flex-1">
+                <div class="font-medium text-white text-sm group-hover:text-purple-300">Cały Set</div>
+                <div class="text-xs text-zinc-500">Zbieraj kompletny set Pokemon</div>
+              </div>
+              <i data-lucide="box" class="w-4 h-4 text-zinc-600 group-has-[:checked]:text-purple-500"></i>
+            </label>
+            
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-pink-500/50 cursor-pointer transition-colors group has-[:checked]:border-pink-500 has-[:checked]:bg-pink-500/5">
+              <input type="radio" name="collection_type" value="artist" class="w-4 h-4 text-pink-600 border-zinc-700 focus:ring-pink-500 bg-zinc-900">
+              <div class="flex-1">
+                <div class="font-medium text-white text-sm group-hover:text-pink-300">Karty Artysty</div>
+                <div class="text-xs text-zinc-500">Zbieraj prace ulubionego artysty</div>
+              </div>
+              <i data-lucide="palette" class="w-4 h-4 text-zinc-600 group-has-[:checked]:text-pink-500"></i>
+            </label>
+          </div>
+        </div>
+        
+        <div class="space-y-1.5">
+          <label for="collection-name" class="block text-xs font-medium text-zinc-400">Nazwa kolekcji</label>
+          <input type="text" id="collection-name" name="name" required placeholder="np. Ulubione Karty" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm focus:border-indigo-500 focus:outline-none transition-colors">
+        </div>
+        
+        <div class="space-y-1.5">
+          <label for="collection-description" class="block text-xs font-medium text-zinc-400">Opis (opcjonalnie)</label>
+          <textarea id="collection-description" name="description" rows="2" placeholder="Krótki opis..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm focus:border-indigo-500 focus:outline-none transition-colors"></textarea>
+        </div>
+        
+        <!-- Set-specific fields -->
+        <div class="space-y-3 set-fields" hidden>
+          <label for="set-select" class="block text-xs font-medium text-zinc-400">Wybierz set</label>
+          <select id="set-select" name="set_code" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none">
+            <option value="">-- Wybierz set --</option>
+          </select>
+          
+          <div class="flex gap-4 pt-2">
+             <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="set_type" value="baseset" checked class="text-purple-600 bg-zinc-900 border-zinc-700">
+                <span class="text-sm text-zinc-300">Baseset</span>
+             </label>
+             <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="set_type" value="masterset" class="text-purple-600 bg-zinc-900 border-zinc-700">
+                <span class="text-sm text-zinc-300">Masterset</span>
+             </label>
+          </div>
+        </div>
+        
+        <!-- Artist-specific fields -->
+        <div class="space-y-3 artist-fields" hidden>
+          <label for="artist-select" class="block text-xs font-medium text-zinc-400">Wybierz artystę</label>
+          <select id="artist-select" name="artist_name" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm focus:border-pink-500 focus:outline-none">
+            <option value="">-- Wybierz artystę --</option>
+          </select>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="button" class="flex-1 py-2.5 border border-zinc-700 text-zinc-300 rounded-lg hover:bg-zinc-800 transition-colors text-sm font-medium" data-close-modal>Anuluj</button>
+          <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors text-sm font-medium shadow-lg shadow-indigo-900/20">Utwórz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const collectionsGrid = document.getElementById('collections-grid');
+  const emptyState = document.getElementById('empty-state');
+  const loadingState = document.getElementById('loading-state');
+  const modal = document.getElementById('new-collection-modal');
+  const form = document.getElementById('new-collection-form');
+  const setFields = document.querySelectorAll('.set-fields');
+  const artistFields = document.querySelectorAll('.artist-fields');
+  const collectionTypeInputs = document.querySelectorAll('input[name="collection_type"]');
+  const totalValueEl = document.getElementById('total-portfolio-value');
+  
+  // Load Stats
+  async function loadStats() {
+      try {
+          const res = await fetch('/cards/stats?use_history=false', {
+             headers: { 'Authorization': `Bearer ${localStorage.getItem('kartoteka_token')}` }
+          });
+          if(res.ok) {
+              const data = await res.json();
+              if(totalValueEl) {
+                  totalValueEl.textContent = (data.total_value || 0).toFixed(2) + " PLN";
+              }
+          }
+      } catch(e) { console.error("Stats load error", e); }
+  }
+  
+  // Load collections
+  async function loadCollections() {
+    loadingState.hidden = false;
+    emptyState.hidden = true;
+    collectionsGrid.innerHTML = '';
+    
+    try {
+      const response = await fetch('/collections/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('kartoteka_token')}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Failed to load collections');
+      
+      const collections = await response.json();
+      loadingState.hidden = true;
+      
+      if (collections.length === 0) {
+        emptyState.hidden = false;
+        return;
+      }
+      
+      collections.forEach(renderCollectionCard);
+    } catch (error) {
+      console.error('Error loading collections:', error);
+      loadingState.hidden = true;
+      emptyState.hidden = false;
+    }
+  }
+  
+  function renderCollectionCard(collection) {
+    const card = document.createElement('a');
+    card.href = `/my-collections/${collection.id}`;
+    card.className = 'collection-card';
+    
+    // Icon Logic
+    let iconName = 'folder';
+    let colorClass = 'text-zinc-500';
+    
+    if(collection.collection_type === 'set') {
+        iconName = 'box';
+        colorClass = 'text-purple-500';
+    } else if(collection.collection_type === 'artist') {
+        iconName = 'palette';
+        colorClass = 'text-pink-500';
+    } else {
+        iconName = 'star';
+        colorClass = 'text-yellow-500';
+    }
+    
+    const typeLabel = {
+      'custom': 'Własna',
+      'set': collection.set_type === 'masterset' ? 'Masterset' : 'Baseset',
+      'artist': 'Artysta'
+    }[collection.collection_type] || 'Kolekcja';
+    
+    const subtitle = collection.set_name || collection.artist_name || 'Kolekcja niestandardowa';
+    
+    card.innerHTML = `
+      <div class="collection-cover" style="${collection.cover_image ? `background-image: url('${collection.cover_image}')` : ''}">
+        ${!collection.cover_image ? `<i data-lucide="${iconName}" class="collection-icon ${colorClass}"></i>` : ''}
+      </div>
+      <div class="collection-info">
+        <span class="collection-type-badge">${typeLabel}</span>
+        <h3 class="collection-name">${collection.name}</h3>
+        <p class="collection-subtitle truncate">${subtitle}</p>
+        <div class="collection-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${collection.progress_percent}%"></div>
+          </div>
+          <div class="progress-text">
+            <span>${collection.owned_cards}/${collection.total_cards}</span>
+            <span>${collection.progress_percent.toFixed(0)}%</span>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    collectionsGrid.appendChild(card);
+    if(window.lucide) lucide.createIcons();
+  }
+  
+  // Toggle fields based on collection type
+  collectionTypeInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const type = this.value;
+      
+      setFields.forEach(el => el.hidden = type !== 'set');
+      artistFields.forEach(el => el.hidden = type !== 'artist');
+      
+      // Load sets or artists if needed
+      if (type === 'set') {
+        loadSets();
+      } else if (type === 'artist') {
+        loadArtists();
+      }
+    });
+  });
+  
+  async function loadSets() {
+    const select = document.getElementById('set-select');
+    if (select.options.length > 1) return; // Already loaded
+    
+    try {
+      const response = await fetch('/collections/sets/list');
+      if (!response.ok) throw new Error('Failed to load sets');
+      
+      const sets = await response.json();
+      sets.forEach(set => {
+        const option = document.createElement('option');
+        option.value = set.code;
+        option.textContent = `${set.name} (${set.code}) - ${set.total_cards || '?'} kart`;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error loading sets:', error);
+    }
+  }
+  
+  async function loadArtists() {
+    const select = document.getElementById('artist-select');
+    if (select.options.length > 1) return; // Already loaded
+    
+    try {
+      const response = await fetch('/collections/artists/list');
+      if (!response.ok) throw new Error('Failed to load artists');
+      
+      const artists = await response.json();
+      artists.forEach(artist => {
+        const option = document.createElement('option');
+        option.value = artist.name;
+        option.textContent = `${artist.name} (${artist.card_count} kart)`;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error loading artists:', error);
+    }
+  }
+  
+  // Modal handlers
+  function openModal() {
+    modal.classList.remove('hidden');
+    // document.body.style.overflow = 'hidden';
+  }
+  
+  function closeModal() {
+    modal.classList.add('hidden');
+    // document.body.style.overflow = '';
+    form.reset();
+    setFields.forEach(el => el.hidden = true);
+    artistFields.forEach(el => el.hidden = true);
+  }
+  
+  const newBtn = document.getElementById('new-collection-btn');
+  if(newBtn) newBtn.addEventListener('click', openModal);
+  
+  const emptyNewBtn = document.getElementById('empty-new-collection-btn');
+  if(emptyNewBtn) emptyNewBtn.addEventListener('click', openModal);
+  
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', closeModal);
+  });
+  
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+  
+  // Form submission
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const type = formData.get('collection_type');
+    
+    const payload = {
+      name: formData.get('name'),
+      description: formData.get('description') || null,
+      collection_type: type
+    };
+    
+    if (type === 'set') {
+      payload.set_code = formData.get('set_code');
+      payload.set_type = formData.get('set_type');
+      
+      if (!payload.set_code) {
+        alert('Wybierz set');
+        return;
+      }
+    } else if (type === 'artist') {
+      payload.artist_name = formData.get('artist_name');
+      
+      if (!payload.artist_name) {
+        alert('Wybierz artystę');
+        return;
+      }
+    }
+    
+    try {
+      const response = await fetch('/collections/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('kartoteka_token')}`
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create collection');
+      }
+      
+      closeModal();
+      loadCollections();
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      alert('Błąd: ' + error.message);
+    }
+  });
+  
+  // Initial load
+  loadCollections();
+  loadStats();
+});
+</script>
+{% endblock %}

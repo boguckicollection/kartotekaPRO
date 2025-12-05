@@ -70,6 +70,31 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  collector:
+    build:
+      context: .
+      dockerfile: kartoteka_server/Dockerfile
+    container_name: kartoteka_collector
+    ports:
+      - "8001:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - KARTOTEKA_RELOAD=false
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY:-}
+      - RAPIDAPI_HOST=${RAPIDAPI_HOST:-pokemon-tcg-api.p.rapidapi.com}
+      - POKEMONTCG_API_KEY=${POKEMONTCG_API_KEY:-}
+      - SHOPER_API_URL=${SHOPER_API_URL:-}
+      - SHOPER_API_TOKEN=${SHOPER_API_TOKEN:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - WEBDAV_URL=${WEBDAV_URL:-}
+      - WEBDAV_USER=${WEBDAV_USER:-}
+      - WEBDAV_PASSWORD=${WEBDAV_PASSWORD:-}
+    volumes:
+      - ./kartoteka_server/kartoteka_web:/app/kartoteka_web
+      - ./storage:/app/storage
+    restart: unless-stopped
+
   ntfy:
     image: binwiederhier/ntfy:latest
     container_name: kartoteka_ntfy
