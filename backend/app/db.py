@@ -449,6 +449,7 @@ class Auction(Base):
     product = relationship("Product", foreign_keys=[product_id])
     catalog = relationship("CardCatalog", foreign_keys=[catalog_id])
     bids = relationship("AuctionBid", back_populates="auction", cascade="all, delete-orphan")
+    messages = relationship("AuctionMessage", back_populates="auction", cascade="all, delete-orphan")
 
 
 class AuctionBid(Base):
@@ -469,6 +470,26 @@ class AuctionBid(Base):
     
     # Relationships
     auction = relationship("Auction", back_populates="bids")
+
+
+class AuctionMessage(Base):
+    """
+    Chat message in an auction room.
+    """
+    __tablename__ = "auction_messages"
+    id = Column(Integer, primary_key=True, index=True)
+    
+    auction_id = Column(Integer, ForeignKey("auctions.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    # Message sender
+    kartoteka_user_id = Column(Integer, nullable=True) # If None, it's a system/admin message
+    username = Column(String(255), nullable=False)
+    
+    message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    
+    # Relationships
+    auction = relationship("Auction", back_populates="messages")
 
 
 def init_db():

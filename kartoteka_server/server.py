@@ -413,6 +413,38 @@ async def auctions_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("auctions.html", context)
 
 
+@app.get("/auctions/{auction_id}", response_class=HTMLResponse)
+async def auction_detail_page(request: Request, auction_id: int) -> HTMLResponse:
+    """Page showing details of a specific auction."""
+    username, invalid_credentials, avatar_url, is_admin = await _resolve_request_user(request)
+    user_id = None
+    
+    if username and not invalid_credentials:
+        try:
+            token = None
+            try:
+                token = await oauth2_scheme(request)
+            except HTTPException:
+                token = request.cookies.get("access_token")
+            
+            if token:
+                with session_scope() as session:
+                     user = await get_current_user(session=session, token=token)
+                     user_id = user.id
+        except Exception:
+            pass
+
+    context = {
+        "request": request,
+        "username": "" if invalid_credentials else username,
+        "avatar_url": "" if invalid_credentials else avatar_url,
+        "is_admin": False if invalid_credentials else is_admin,
+        "user_id": user_id,
+        "auction_id": auction_id
+    }
+    return templates.TemplateResponse("auction_detail.html", context)
+
+
 @app.get("/sets/{set_code}/print", response_class=HTMLResponse)
 async def set_print_page(request: Request, set_code: str) -> HTMLResponse:
     """Print template page for a specific set (without collection)."""

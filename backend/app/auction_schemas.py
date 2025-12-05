@@ -86,6 +86,7 @@ class AuctionRead(AuctionBase):
 class AuctionDetail(AuctionRead):
     """Detailed auction with bids."""
     bids: List[BidRead] = []
+    messages: List[MessageRead] = []
     product_name: Optional[str] = None
     card_name: Optional[str] = None
 
@@ -133,5 +134,27 @@ class KartotekaUserRead(BaseModel):
     won_auctions: int = 0
     total_spent: float = 0.0
     
+    class Config:
+        from_attributes = True
+
+
+# ========== Message Schemas ==========
+
+class MessageCreate(BaseModel):
+    """Schema for sending a chat message."""
+    message: str = Field(..., min_length=1, max_length=1000)
+    kartoteka_user_id: Optional[int] = None # If None, sent as system/admin
+    username: str
+
+
+class MessageRead(BaseModel):
+    """Schema for reading a chat message."""
+    id: int
+    auction_id: int
+    kartoteka_user_id: Optional[int]
+    username: str
+    message: str
+    timestamp: datetime
+
     class Config:
         from_attributes = True

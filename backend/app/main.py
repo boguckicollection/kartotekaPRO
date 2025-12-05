@@ -1557,8 +1557,9 @@ async def manual_search(body: dict = Body(default={})):
             "card": {
                 "id": best_cand.id,
                 "name": best_cand.name,
-                "number": best_cand.number,
+                "number": best_cand.number or details.get("number") or details.get("collection_number"),
                 "set": best_cand.set,
+                "set_code": best_cand.set_code or details.get("set_code"),
                 "image": details.get("image"),
                 "rarity": details.get("rarity"),
             },

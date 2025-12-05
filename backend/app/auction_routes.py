@@ -12,11 +12,11 @@ import os
 import uuid
 from pathlib import Path
 
-from .db import SessionLocal, Auction, AuctionBid, KartotekaUser, Product, CardCatalog
+from .db import SessionLocal, Auction, AuctionBid, AuctionMessage, KartotekaUser, Product, CardCatalog
 from .auction_schemas import (
     AuctionCreate, AuctionUpdate, AuctionRead, AuctionDetail, 
     AuctionList, BidCreate, BidRead, AuctionStats, KartotekaUserSync,
-    KartotekaUserRead
+    KartotekaUserRead, MessageCreate, MessageRead
 )
 from .websocket import manager
 from .settings import settings
@@ -247,6 +247,11 @@ def get_auction(
         AuctionBid.auction_id == auction_id
     ).order_by(desc(AuctionBid.timestamp)).all()
     
+    # Get recent messages (last 50)
+    messages = db.query(AuctionMessage).filter(
+        AuctionMessage.auction_id == auction_id
+    ).order_by(desc(AuctionMessage.timestamp)).limit(50).all()
+    
     # Get product/card name
     product_name = None
     card_name = None
@@ -264,6 +269,7 @@ def get_auction(
     # Build response
     auction_data = AuctionDetail.from_orm(auction)
     auction_data.bids = [BidRead.from_orm(bid) for bid in bids]
+    auction_data.messages = [MessageRead.from_orm(msg) for msg in messages]
     auction_data.product_name = product_name
     auction_data.card_name = card_name
     
@@ -639,3 +645,59 @@ def list_users(db: DBSession = Depends(get_db)):
         result.append(user_data)
         
     return result
+
+
+# ========== Message Endpoints ==========
+
+@router.post("/{auction_id}/messages", response_model=MessageRead, status_code=201)
+async def send_message(
+    auction_id: int,
+    message_data: MessageCreate,
+    db: DBSession = Depends(get_db)
+):
+    """Send a chat message to the auction room."""
+    auction = db.query(Auction).filter(Auction.id == auction_id).first()
+    if not auction:
+        raise HTTPException(status_code=404, detail="Auction not found")
+        
+    message = AuctionMessage(
+        auction_id=auction_id,
+        kartoteka_user_id=message_data.kartoteka_user_id,
+        username=message_data.username,
+        message=message_data.message,
+        timestamp=datetime.now(timezone.utc)
+    )
+    
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    
+    # Broadcast via WebSocket
+    await manager.broadcast({
+        "type": "new_message",
+        "auction_id": auction_id,
+        "message": {
+            "id": message.id,
+            "username": message.username,
+            "message": message.message,
+            "timestamp": message.timestamp.isoformat(),
+            "kartoteka_user_id": message.kartoteka_user_id
+        }
+    })
+    
+    return MessageRead.from_orm(message)
+
+
+@router.get("/{auction_id}/messages", response_model=List[MessageRead])
+def get_auction_messages(
+    auction_id: int,
+    limit: int = 50,
+    db: DBSession = Depends(get_db)
+):
+    """Get recent chat messages for an auction."""
+    messages = db.query(AuctionMessage).filter(
+        AuctionMessage.auction_id == auction_id
+    ).order_by(desc(AuctionMessage.timestamp)).limit(limit).all()
+    
+    # Return newest first (frontend can reverse if needed)
+    return [MessageRead.from_orm(m) for m in messages]
