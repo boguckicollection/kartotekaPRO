@@ -390,10 +390,16 @@ async def auctions_page(request: Request) -> HTMLResponse:
     
     if username and not invalid_credentials:
         try:
-            token = await oauth2_scheme(request)
-            with session_scope() as session:
-                 user = await get_current_user(session=session, token=token)
-                 user_id = user.id
+            token = None
+            try:
+                token = await oauth2_scheme(request)
+            except HTTPException:
+                token = request.cookies.get("access_token")
+            
+            if token:
+                with session_scope() as session:
+                     user = await get_current_user(session=session, token=token)
+                     user_id = user.id
         except Exception:
             pass
 

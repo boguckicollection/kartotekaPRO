@@ -683,10 +683,13 @@
           });
           showAlert(
             alertBox,
-            "Konto utworzone. Możesz się zalogować.",
+            "Konto utworzone. Przekierowanie do logowania...",
             "success",
           );
           registerForm.reset();
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 1500);
         } catch (error) {
           showAlert(alertBox, error.message || "Nie udało się utworzyć konta.", "error");
         }

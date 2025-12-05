@@ -75,9 +75,50 @@
   </div>
 </div>
 
+<!-- Login Modal -->
+<div id="login-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" aria-hidden="true">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="login-modal-content">
+    
+    <div class="flex justify-between items-center p-5 border-b border-zinc-800">
+      <h2 class="text-lg font-bold text-white flex items-center gap-2">
+        <i data-lucide="log-in" class="w-5 h-5 text-indigo-400"></i>
+        Zaloguj się
+      </h2>
+      <button onclick="closeLoginModal()" class="text-zinc-400 hover:text-white p-2 rounded-lg hover:bg-zinc-800 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-4">
+      <p class="text-zinc-400 text-sm mb-4">Aby wziąć udział w licytacji, musisz być zalogowany.</p>
+      
+      <form id="login-form" class="space-y-4">
+        <div>
+            <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Nazwa użytkownika</label>
+            <input type="text" id="login-username" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1">Hasło</label>
+            <input type="password" id="login-password" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+          Zaloguj się
+        </button>
+      </form>
+      
+      <div id="login-msg" class="hidden p-3 rounded-lg text-sm text-center font-medium"></div>
+      
+      <div class="text-center mt-4">
+        <a href="/register" class="text-xs text-indigo-400 hover:text-indigo-300">Nie masz konta? Zarejestruj się</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // Use relative path if on same domain/port, but here we need cross-port
-const API_BASE = `http://${window.location.hostname}:8000/api/auctions`; 
+const API_BASE = `http://${window.location.hostname}:8000/auctions`; 
 // Ensure USER_ID is safe
 const USER_ID = {{ user_id or 'null' }};
 const USERNAME = "{{ username or '' }}";
@@ -206,12 +247,15 @@ const modalContent = document.getElementById('bid-modal-content');
 const form = document.getElementById('bid-form');
 const msgDiv = document.getElementById('bid-msg');
 
+// Login Modal Logic
+const loginModal = document.getElementById('login-modal');
+const loginContent = document.getElementById('login-modal-content');
+const loginForm = document.getElementById('login-form');
+const loginMsg = document.getElementById('login-msg');
+
 window.openBid = function(id, currentPrice, increment) {
     if (!USER_ID || USER_ID === 'null') {
-        // Show simplified login prompt or redirect
-        if(confirm("Musisz być zalogowany, aby licytować. Przejść do logowania?")) {
-            window.location.href = "/login";
-        }
+        openLoginModal();
         return;
     }
     
@@ -247,6 +291,24 @@ function closeModal() {
     }, 300);
 }
 
+function openLoginModal() {
+    loginModal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        loginModal.classList.remove('opacity-0');
+        loginContent.classList.remove('scale-95');
+        loginContent.classList.add('scale-100');
+    });
+}
+
+window.closeLoginModal = function() {
+    loginModal.classList.add('opacity-0');
+    loginContent.classList.remove('scale-100');
+    loginContent.classList.add('scale-95');
+    setTimeout(() => {
+        loginModal.classList.add('hidden');
+    }, 300);
+}
+
 document.querySelectorAll('.close-button').forEach(btn => {
     btn.onclick = closeModal;
 });
@@ -254,6 +316,9 @@ document.querySelectorAll('.close-button').forEach(btn => {
 // Close on outside click
 modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
+});
+loginModal.addEventListener('click', (e) => {
+    if (e.target === loginModal) closeLoginModal();
 });
 
 form.onsubmit = async (e) => {
@@ -310,6 +375,43 @@ form.onsubmit = async (e) => {
         submitBtn.innerHTML = originalBtnText;
     }
 };
+
+loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const btn = loginForm.querySelector('button[type="submit"]');
+    
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Logowanie...';
+    
+    try {
+        const res = await fetch('/users/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || 'Błąd logowania');
+        }
+        
+        loginMsg.textContent = "Zalogowano pomyślnie!";
+        loginMsg.className = 'p-3 rounded-lg text-sm text-center font-medium bg-emerald-500/10 text-emerald-400 block';
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+        
+    } catch (err) {
+        loginMsg.textContent = err.message;
+        loginMsg.className = 'p-3 rounded-lg text-sm text-center font-medium bg-red-500/10 text-red-400 block';
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
 
 // Initial load
 loadAuctions();

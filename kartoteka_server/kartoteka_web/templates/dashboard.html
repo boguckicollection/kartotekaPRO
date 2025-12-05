@@ -268,7 +268,7 @@
 {% block content %}
 
 <!-- Compact Hero -->
-<section class="bg-zinc-950 border-b border-zinc-800 py-6">
+<section class="bg-zinc-950 pt-8 pb-2">
   <div class="container mx-auto px-4 max-w-6xl">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
@@ -276,7 +276,6 @@
           Twoja kolekcja
         </div>
         <h1 class="text-2xl font-semibold text-white tracking-tight">Witaj, {{ username }}!</h1>
-        <p class="text-sm text-zinc-400 mt-1">Zarządzaj swoją kolekcją kart - edytuj ilości, śledź wartość i dodawaj nowe karty</p>
       </div>
       <div class="flex gap-2">
         <a href="/cards/add" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-md transition-colors">
@@ -292,14 +291,45 @@
   </div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-6 bg-black border-b border-zinc-800">
+<!-- Value & Chart Section -->
+<section class="bg-zinc-950 border-b border-zinc-800 pb-8 pt-4">
   <div class="container mx-auto px-4 max-w-6xl">
-    <h2 class="text-sm font-semibold text-zinc-300 mb-3 flex items-center gap-2">
-      <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
-      Statystyki kolekcji
-    </h2>
     
+    <!-- Value Display -->
+    <div class="mb-6">
+        <h2 class="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-1">Całkowita wartość portfela</h2>
+        <div class="flex items-baseline gap-3">
+            <span class="text-5xl md:text-6xl font-bold text-emerald-400 tracking-tighter" id="stat-total-value">0.00 PLN</span>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="relative">
+      <div class="chart-container" style="background: transparent; border: none; padding: 0; margin-top: 0; height: 300px;">
+        <canvas id="collection-value-chart"></canvas>
+      </div>
+      
+      <!-- Chart Controls Overlay -->
+      <div class="flex justify-end mt-2 gap-4 items-center">
+         <div class="form-control form-control--checkbox">
+            <input type="checkbox" id="toggle-products-value" checked>
+            <label for="toggle-products-value">Produkty</label>
+         </div>
+         <div class="button-group" id="chart-range-selector">
+            <button type="button" class="button" data-range="90d">90D</button>
+            <button type="button" class="button" data-range="60d">60D</button>
+            <button type="button" class="button is-active" data-range="30d">30D</button>
+            <button type="button" class="button" data-range="7d">7D</button>
+         </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Stats Grid Section -->
+<section class="py-8 bg-black border-b border-zinc-800">
+  <div class="container mx-auto px-4 max-w-6xl">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Liczba kart</div>
@@ -313,60 +343,19 @@
         <div class="stat-label">Produkty</div>
         <div class="stat-value" id="stat-total-products">0</div>
       </div>
-      <div class="stat-card stat-card--highlight">
-        <div class="stat-label">Wartość kolekcji</div>
-        <div class="stat-value text-indigo-400" id="stat-total-value">0 PLN</div>
-        <div class="stat-breakdown">
-          <span><small>Karty:</small> <span id="stat-cards-value">0 PLN</span></span>
-          <span><small>Produkty:</small> <span id="stat-products-value">0 PLN</span></span>
-        </div>
+      <div class="stat-card">
+        <div class="stat-label">Koszt zakupu</div>
+        <div class="stat-value" id="stat-purchase-value">0 PLN</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Zysk/Strata</div>
+        <div class="stat-value" id="stat-profit-loss">0 PLN</div>
       </div>
     </div>
     
-    <details class="stats-purchase-details">
-      <summary>Pokaż koszty zakupu</summary>
-      <div class="stats-grid stats-grid--secondary">
-        <div class="stat-card stat-card--small">
-          <div class="stat-label">Koszt zakupu (razem)</div>
-          <div class="stat-value" id="stat-purchase-value">0 PLN</div>
-        </div>
-        <div class="stat-card stat-card--small">
-          <div class="stat-label">Zysk/Strata</div>
-          <div class="stat-value" id="stat-profit-loss">0 PLN</div>
-        </div>
-      </div>
-    </details>
-  </div>
-</section>
-
-<!-- Chart Section -->
-<section class="py-6 bg-zinc-950 border-b border-zinc-800">
-  <div class="container mx-auto px-4 max-w-6xl">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
-      <div>
-        <h2 class="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-          <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
-          Wartość kolekcji w czasie
-        </h2>
-        <p class="text-xs text-zinc-500 mt-1">Historia wartości Twojej kolekcji</p>
-      </div>
-      <div class="chart-controls">
-        <div class="form-control form-control--checkbox">
-          <input type="checkbox" id="toggle-products-value" checked>
-          <label for="toggle-products-value">Produkty</label>
-        </div>
-        <div class="button-group" id="chart-range-selector">
-          <button type="button" class="button" data-range="90d">90D</button>
-          <button type="button" class="button" data-range="60d">60D</button>
-          <button type="button" class="button is-active" data-range="30d">30D</button>
-          <button type="button" class="button" data-range="7d">7D</button>
-        </div>
-      </div>
-    </div>
-    <div class="alert bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-400" id="chart-alert" hidden></div>
-    <div class="chart-container">
-      <canvas id="collection-value-chart"></canvas>
-    </div>
+    <!-- Hidden detailed breakdown for JS compatibility if needed -->
+    <span id="stat-cards-value" hidden></span>
+    <span id="stat-products-value" hidden></span>
   </div>
 </section>
 

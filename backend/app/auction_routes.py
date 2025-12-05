@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Depends, Query, WebSocket, UploadFile, File
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import desc, and_, or_, func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 import logging
 import shutil
@@ -22,7 +22,7 @@ from .websocket import manager
 from .settings import settings
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/auctions", tags=["Auctions"])
+router = APIRouter(prefix="/auctions", tags=["Auctions"])
 
 
 # ========== Dependencies ==========
@@ -117,7 +117,14 @@ def create_auction(
     if auction_data.end_time <= auction_data.start_time:
         raise HTTPException(status_code=400, detail="end_time must be after start_time")
     
-    if auction_data.end_time <= datetime.utcnow():
+    # Ensure timezone-aware comparison
+    now = datetime.now(timezone.utc)
+    # If end_time is naive, assume UTC
+    end_time_aware = auction_data.end_time
+    if end_time_aware.tzinfo is None:
+        end_time_aware = end_time_aware.replace(tzinfo=timezone.utc)
+        
+    if end_time_aware <= now:
         raise HTTPException(status_code=400, detail="end_time must be in the future")
     
     # Validate product or catalog exists
